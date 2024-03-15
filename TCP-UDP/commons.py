@@ -58,13 +58,15 @@ class TCPSocket:
     def __init__(self, socket: socket) -> None:
         self._socket = socket
 
-    def send_text_msg(self, msg: str) -> None:
+    def send_text_msg(self, msg: str) -> int:
         payload = bytes(msg, _ENCODING)
         self._send_msg(MessageType.TEXT, payload)
+        return len(payload)
 
-    def send_json_msg(self, msg: dict[str, any]) -> None:
+    def send_json_msg(self, msg: dict[str, any]) -> int:
         payload = bytes(dumps(msg), _ENCODING)
         self._send_msg(MessageType.JSON, payload)
+        return len(payload)
 
     def _send_msg(self, msg_type: MessageType, payload: bytes) -> None:
         header = pack(_HEADER_FORMAT, len(payload), msg_type)

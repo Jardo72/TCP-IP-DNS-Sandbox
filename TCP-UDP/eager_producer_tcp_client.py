@@ -1,11 +1,12 @@
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from random import randint
 from uuid import uuid4
 
 from commons import open_tcp_connection, random_sleep
 
 
 def create_cmd_line_args_parser() -> ArgumentParser:
-    parser = ArgumentParser(description="TCP Client", formatter_class=RawTextHelpFormatter)
+    parser = ArgumentParser(description="Eager Producer TCP Client", formatter_class=RawTextHelpFormatter)
 
     parser.add_argument(
         "address",
@@ -47,18 +48,27 @@ def parse_cmd_line_args() -> Namespace:
     return params
 
 
+def generate_random_msg(client_name: str, seq_no: int) -> dict[str, any]:
+    number_count = randint(1000, 3000)
+    uuid_count = randint(1000, 3000)
+    return {
+        "client_name": client_name,
+        "sequence_number": seq_no,
+        "random_numbers": [randint(10000000, 20000000) for _ in range(number_count)],
+        "uuids": [str(uuid4() for _ in range(uuid_count))]
+    }
+
+
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     client_name = cmd_line_args.client_name or str(uuid4())
     print(f"TCP client going to connect to {cmd_line_args.address}:{cmd_line_args.port}")
     socket = open_tcp_connection(cmd_line_args.address, cmd_line_args.port, cmd_line_args.connect_timeout_sec)
     for i in range(1, cmd_line_args.msg_count + 1):
-        output_msg = f"Message #{i} from client {client_name}"
-        socket.send_text_msg(output_msg)
-        print(f"Message sent to server: '{output_msg}'")
-        input_msg = socket.recv_text_msg()
-        print(f"Message from server received: '{input_msg}'")
-        random_sleep(min_sec=5, max_sec=25)
+        msg = generate_random_msg(client_name, i)
+        msg_length = socket.send_json_msg(msg)
+        print(f"Message with sequence number = {i} ({msg_length} bytes) sent to server...")
+        random_sleep(min_sec=2, max_sec=5)
 
 
 if __name__ == "__main__":
