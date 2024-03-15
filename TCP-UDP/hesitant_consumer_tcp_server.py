@@ -30,11 +30,13 @@ def main() -> None:
     print(f"TCP server going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
     try:
         listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port)
+        connection, (remote_address, remote_port) = listener.accept()
+        client_socket = TCPSocket(connection)
+        rcv_buf_size = client_socket.get_rcv_buff_size()
+        print(f"Client connection accepted from ({remote_address}:{remote_port}), input buffer size = {rcv_buf_size} bytes...")
+        input("Press enter to start reading the data")
         while True:
-            connection, (remote_address, remote_port) = listener.accept()
-            client_socket = TCPSocket(connection)
-            rcv_buf_size = client_socket.get_rcv_buff_size()
-            print(f"Client connection accepted from ({remote_address}:{remote_port}), input buffer size = {rcv_buf_size} bytes...")
+            client_socket.recv_json_msg()
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
 
