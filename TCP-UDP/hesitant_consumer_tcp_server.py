@@ -32,7 +32,9 @@ def main() -> None:
         listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port)
         while True:
             connection, (remote_address, remote_port) = listener.accept()
-            print(f"Client connection accepted from ({remote_address}:{remote_port})...")
+            client_socket = TCPSocket(connection)
+            rcv_buf_size = client_socket.get_rcv_buff_size()
+            print(f"Client connection accepted from ({remote_address}:{remote_port}), input buffer size = {rcv_buf_size} bytes...")
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
 

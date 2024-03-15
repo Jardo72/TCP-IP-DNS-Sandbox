@@ -14,7 +14,9 @@ from socket import (
     IP_MULTICAST_TTL,
     SOCK_DGRAM,
     SOL_SOCKET,
+    SO_RCVBUF,
     SO_REUSEADDR,
+    SO_SNDBUF,
 )
 from struct import calcsize, pack, unpack
 from time import sleep
@@ -58,20 +60,25 @@ class TCPSocket:
     def __init__(self, socket: socket) -> None:
         self._socket = socket
 
+    def get_snd_buff_size(self) -> int:
+        return self._socket.getsockopt(SOL_SOCKET, SO_SNDBUF)
+
+    def get_rcv_buff_size(self) -> int:
+        return self._socket.getsockopt(SOL_SOCKET, SO_RCVBUF)
+
     def send_text_msg(self, msg: str) -> int:
         payload = bytes(msg, _ENCODING)
-        self._send_msg(MessageType.TEXT, payload)
-        return len(payload)
+        return self._send_msg(MessageType.TEXT, payload)
 
     def send_json_msg(self, msg: dict[str, any]) -> int:
         payload = bytes(dumps(msg), _ENCODING)
-        self._send_msg(MessageType.JSON, payload)
-        return len(payload)
+        return self._send_msg(MessageType.JSON, payload)
 
-    def _send_msg(self, msg_type: MessageType, payload: bytes) -> None:
+    def _send_msg(self, msg_type: MessageType, payload: bytes) -> int:
         header = pack(_HEADER_FORMAT, len(payload), msg_type)
         self._socket.sendall(header)
         self._socket.sendall(payload)
+        return len(header) + len(payload)
 
     def recv_text_msg(self) -> str | None:
         length, msg_type = self._recv_header()

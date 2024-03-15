@@ -64,10 +64,14 @@ def main() -> None:
     client_name = cmd_line_args.client_name or str(uuid4())
     print(f"TCP client going to connect to {cmd_line_args.address}:{cmd_line_args.port}")
     socket = open_tcp_connection(cmd_line_args.address, cmd_line_args.port, cmd_line_args.connect_timeout_sec)
+    snd_buff_size = socket.get_snd_buff_size()
+    print(f"Connection established, output buffer = {snd_buff_size} bytes")
+    cumulative_byte_count = 0
     for i in range(1, cmd_line_args.msg_count + 1):
         msg = generate_random_msg(client_name, i)
         msg_length = socket.send_json_msg(msg)
-        print(f"Message with sequence number = {i} ({msg_length} bytes) sent to server...")
+        cumulative_byte_count += msg_length
+        print(f"Message with sequence number = {i} ({msg_length} bytes, totally {cumulative_byte_count} bytes) sent to server...")
         random_sleep(min_sec=2, max_sec=5)
 
 
