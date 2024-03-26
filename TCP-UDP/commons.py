@@ -181,6 +181,7 @@ def open_tcp_connection(address: str, port: int, timeout_sec: int) -> TCPSocket:
 
 def open_udp_listener(address: str, port: int, msg_size: int = 4096) -> UDPSocket:
     listener = socket(AF_INET, SOCK_DGRAM)
+    listener.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     listener.bind((address, port))
     return UDPSocket(listener, msg_size)
 
