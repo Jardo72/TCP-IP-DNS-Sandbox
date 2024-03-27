@@ -25,8 +25,10 @@ from random import random
 from socket import (
     create_connection,
     create_server,
+    inet_aton,
     socket,
     AF_INET,
+    INADDR_ANY,
     IPPROTO_IP,
     IPPROTO_UDP,
     IP_ADD_MEMBERSHIP,
@@ -200,6 +202,10 @@ def open_multicast_subscriber(address: str, port: int, msg_size: int = 4096) -> 
     subscriber = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
     subscriber.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     subscriber.bind(("", port))
+
+    membership_request = pack('4sL', inet_aton(address), INADDR_ANY)
+    subscriber.setsockopt(IPPROTO_IP, IP_ADD_MEMBERSHIP, membership_request)
+
     return UDPSocket(subscriber, msg_size)
 
 

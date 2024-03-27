@@ -50,7 +50,7 @@ def main() -> None:
     try:
         subscriber = open_multicast_subscriber(cmd_line_args.address, cmd_line_args.port, 4096)
         while True:
-            input_msg = subscriber.recv_text_msg()
+            _, input_msg = subscriber.recv_text_msg()
             print(f"Message from publisher: '{input_msg}'")
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
