@@ -40,7 +40,7 @@ def create_cmd_line_args_parser() -> ArgumentParser:
         "-n", "--publisher-name",
         dest="publisher_name",
         help="optional publisher name (if not specified, generated UUID will be used)",
-        type=int
+        type=str
     )
 
     return parser
