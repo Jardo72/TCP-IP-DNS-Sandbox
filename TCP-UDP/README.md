@@ -8,17 +8,6 @@ This directory contains a set of applications serving as demonstration of TCP an
 3rd party dependencies which must be installed are listed in the [reuirements.txt](./requirements.txt) file. All applications are self-documented concerning the command line arguments. In other words, if you start any of the applications with the `-h` or `--help` switch, you will get instructions how to start the application.
 
 
-## Status
-
-| Demo                 | File(s)                                                       | Status               |
-| -------------------- | ------------------------------------------------------------- | -------------------- |
-| TCP Unicast          | tcp_client.py, tcp_server.py                                  | Implemented          |
-| TCP Window = 0       | eager_producer_tcp_client.py, hesitant_consumer_tcp_server.py | Implemented          |
-| UDP Unicast          | udp_client.py, udp_server.py                                  | Implemented          |
-| UDP Broadcast        | broadcast_udp_publisher.py, broadcast_udp_consumer.py         | Implemented          |
-| Multicast            | multicast_publisher.py, multicast_subscriber.py               | Implemented          |
-
-
 ## TCP Unicast Communication
 Demonstration of TCP communication.  
 Applications:
