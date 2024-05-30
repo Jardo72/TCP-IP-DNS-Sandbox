@@ -3,7 +3,6 @@
 ## Intruduction
 This directory contains a set of applications serving as demonstration of TCP and UDP communication. Particular applications are described by the subsequent sections of this document. All applications use some reusable functions provided by the [commons.py](./commons.py) module which also encapsulates the socket API. The following diagram illustrates the PDU structure used by the communication, which is the same for TCP and UDP. The header consists of just two fields - payload length and message type.
 
-TODO
 ![PDU Structure](./pdu.png)
 
 3rd party dependencies which must be installed are listed in the [reuirements.txt](./requirements.txt) file. All applications are self-documented concerning the command line arguments. In other words, if you start any of the applications with the `-h` or `--help` switch, you will get instructions how to start the application.
@@ -37,8 +36,8 @@ Applications:
 ## UDP Unicast Communication
 Demonstration of unicast UDP communication.  
 Applications:
-* [udp_server.py](./udp_server.py) opens a UDP post in listening mode.
-* [udp_client.py](./udp_client.py)
+* [udp_server.py](./udp_server.py) is a UDP server which opens a UDP port in listening mode. After opening the port, it ready to receive and answer text messages from UDP clients.
+* [udp_client.py](./udp_client.py) is a UDP client which repeatedly sends text messages to the given IP address and UDP port.
 
 
 ## UDP Broadcast Communication
