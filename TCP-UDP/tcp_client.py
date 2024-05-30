@@ -54,7 +54,7 @@ def create_cmd_line_args_parser() -> ArgumentParser:
         "-n", "--client-name",
         dest="client_name",
         help="optional client name (if not specified, generated UUID will be used)",
-        type=int
+        type=str
     )
 
     return parser
