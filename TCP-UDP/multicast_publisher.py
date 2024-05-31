@@ -27,8 +27,12 @@ from commons import Endpoint, open_multicast_publisher, random_sleep
 # https://pythonhint.com/post/9214111898281392/how-do-you-udp-multicast-in-python
 
 
+def epilog() -> str:
+    return "Multicast IP addresses are from the range 224.0.0.0 ... 239.255.255.255"
+
+
 def create_cmd_line_args_parser() -> ArgumentParser:
-    parser = ArgumentParser(description="Multicast Producer", formatter_class=RawTextHelpFormatter)
+    parser = ArgumentParser(description="Multicast Producer", formatter_class=RawTextHelpFormatter, epilog=epilog())
 
     parser.add_argument(
         "address",

@@ -22,8 +22,12 @@ from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from commons import open_multicast_subscriber
 
 
+def epilog() -> str:
+    return "Multicast IP addresses are from the range 224.0.0.0 ... 239.255.255.255"
+
+
 def create_cmd_line_args_parser() -> ArgumentParser:
-    parser = ArgumentParser(description="Multicast Producer", formatter_class=RawTextHelpFormatter)
+    parser = ArgumentParser(description="Multicast Producer", formatter_class=RawTextHelpFormatter, epilog=epilog())
 
     parser.add_argument(
         "address",
