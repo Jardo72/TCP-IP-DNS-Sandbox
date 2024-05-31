@@ -32,7 +32,7 @@ def create_cmd_line_args_parser() -> ArgumentParser:
 
     parser.add_argument(
         "address",
-        help="the IP address the multicast group the publisher will send messages to"
+        help="the IP address the multicast group the publisher will send messages to (e.g. 224.0.0.1)"
     )
     parser.add_argument(
         "port",

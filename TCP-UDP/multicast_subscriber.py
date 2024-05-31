@@ -27,7 +27,7 @@ def create_cmd_line_args_parser() -> ArgumentParser:
 
     parser.add_argument(
         "address",
-        help="the IP address the multicast group the consumer will read messages from"
+        help="the IP address the multicast group the consumer will read messages from (e.g. 224.0.0.1)"
     )
     parser.add_argument(
         "port",
