@@ -6,8 +6,7 @@
 - dependencies
 
 ## Demo Applications
-
-| Subdirectory         | Description                             |
-| -------------------- | --------------------------------------- |
-| [TCP-UDP](./TCP-UDP) |                                         |
-| [DNS](./DNS)         |                                         |
+| Subdirectory         | Description                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------- |
+| [TCP-UDP](./TCP-UDP) | Set of applications serving as demonstration of TCP and UDP communication (incl. broadcast & multicast) |
+| [DNS](./DNS)         |                                                                                                         |
