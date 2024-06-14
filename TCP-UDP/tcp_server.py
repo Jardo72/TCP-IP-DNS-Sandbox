@@ -18,6 +18,7 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from os import getpid
 from threading import Thread, current_thread
 
 from colorama import init as colorama_init
@@ -37,7 +38,7 @@ class ClientThread(Thread):
         try:
             while True:
                 input_msg = self._socket.recv_text_msg()
-                output_msg = f"Response to message '{input_msg}'"
+                output_msg = f"Response to message: {input_msg}"
                 self._socket.send_text_msg(output_msg)
                 print(f"{self._color}{current_thread().name}: {output_msg}{Style.RESET_ALL}")
         except EOFError:
@@ -69,7 +70,7 @@ def parse_cmd_line_args() -> Namespace:
 def main() -> None:
     colorama_init()
     cmd_line_args = parse_cmd_line_args()
-    print(f"TCP server going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
+    print(f"TCP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
 
     try:
         listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port)

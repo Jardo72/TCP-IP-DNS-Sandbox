@@ -18,6 +18,7 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from os import getpid
 from uuid import uuid4
 
 from commons import Endpoint, open_udp_client, random_sleep
@@ -63,6 +64,7 @@ def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     client_name = cmd_line_args.client_name or str(uuid4())
     destination = Endpoint(cmd_line_args.address, cmd_line_args.port)
+    print(f"UDP client (PID = {getpid()}) going to send messages to {cmd_line_args.address}:{cmd_line_args.port}")
     client = open_udp_client()
     for i in range(1, cmd_line_args.msg_count + 1):
         output_msg = f"Message #{i} from client {client_name}"

@@ -18,6 +18,7 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from os import getpid
 from uuid import uuid4
 
 from commons import Endpoint, open_udp_client, random_sleep
@@ -54,7 +55,7 @@ def parse_cmd_line_args() -> Namespace:
 
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
-    print(f"UDP broadcast publisher is going to publish to {cmd_line_args.address}:{cmd_line_args.port}")
+    print(f"UDP broadcast publisher (PID = {getpid()}) is going to publish to {cmd_line_args.address}:{cmd_line_args.port}")
     try:
         destination = Endpoint(cmd_line_args.address, cmd_line_args.port)
         publisher_name = cmd_line_args.publisher_name or str(uuid4())

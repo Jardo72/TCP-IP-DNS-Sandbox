@@ -18,6 +18,7 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from os import getpid
 from random import randint
 from uuid import uuid4
 
@@ -55,7 +56,7 @@ def create_cmd_line_args_parser() -> ArgumentParser:
         "-n", "--client-name",
         dest="client_name",
         help="optional client name (if not specified, generated UUID will be used)",
-        type=int
+        type=str
     )
 
     return parser
@@ -81,7 +82,7 @@ def generate_random_msg(client_name: str, seq_no: int) -> dict[str, any]:
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     client_name = cmd_line_args.client_name or str(uuid4())
-    print(f"TCP client going to connect to {cmd_line_args.address}:{cmd_line_args.port}")
+    print(f"TCP client (PID = {getpid()}) going to connect to {cmd_line_args.address}:{cmd_line_args.port}")
     socket = open_tcp_connection(cmd_line_args.address, cmd_line_args.port, cmd_line_args.connect_timeout_sec)
     snd_buff_size = socket.get_snd_buff_size()
     print(f"Connection established, output buffer = {snd_buff_size} bytes")

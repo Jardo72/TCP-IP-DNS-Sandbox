@@ -18,6 +18,7 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from os import getpid
 
 from commons import open_udp_listener
 
@@ -46,12 +47,12 @@ def parse_cmd_line_args() -> Namespace:
 
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
-    print(f"UDP broadcast consumer is going to consume from {cmd_line_args.address}:{cmd_line_args.port}")
+    print(f"UDP broadcast consumer (PID = {getpid()}) is going to consume from {cmd_line_args.address}:{cmd_line_args.port}")
     try:
         consumer = open_udp_listener(cmd_line_args.address, cmd_line_args.port, 4096)
         while True:
             _, input_msg = consumer.recv_text_msg()
-            print(f"Message from publisher: '{input_msg}'")
+            print(f"Message from publisher: {input_msg}")
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
 

@@ -18,6 +18,7 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from os import getpid
 
 from commons import TCPSocket, open_tcp_listener
 
@@ -46,7 +47,7 @@ def parse_cmd_line_args() -> Namespace:
 
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
-    print(f"TCP server going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
+    print(f"TCP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
     try:
         listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port)
         connection, (remote_address, remote_port) = listener.accept()

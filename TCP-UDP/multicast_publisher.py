@@ -18,6 +18,7 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from os import getpid
 
 from commons import Endpoint, open_multicast_publisher, random_sleep
 
@@ -36,7 +37,7 @@ def create_cmd_line_args_parser() -> ArgumentParser:
 
     parser.add_argument(
         "address",
-        help="the IP address the multicast group the publisher will send messages to (e.g. 224.0.0.1)"
+        help="the IP address the multicast group the publisher will send messages to (e.g. 224.0.1.1)"
     )
     parser.add_argument(
         "port",
@@ -55,7 +56,7 @@ def parse_cmd_line_args() -> Namespace:
 
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
-    print(f"Multicast publisher is going to publish to {cmd_line_args.address}:{cmd_line_args.port}")
+    print(f"Multicast publisher (PID = {getpid()}) is going to publish to {cmd_line_args.address}:{cmd_line_args.port}")
     try:
         destination = Endpoint(cmd_line_args.address, cmd_line_args.port)
         publisher = open_multicast_publisher(4096)

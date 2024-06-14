@@ -18,6 +18,7 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from os import getpid
 
 from colorama import init as colorama_init
 from colorama import Style
@@ -61,7 +62,7 @@ def parse_cmd_line_args() -> Namespace:
 def main() -> None:
     colorama_init()
     cmd_line_args = parse_cmd_line_args()
-    print(f"UDP server going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
+    print(f"UDP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
     
     try:
         udp_listener = open_udp_listener(cmd_line_args.address, cmd_line_args.port)
@@ -69,7 +70,7 @@ def main() -> None:
         while True:
             endpoint, input_msg = udp_listener.recv_text_msg()
             color = color_registry.get(endpoint)
-            output_msg = f"Response to message '{input_msg}'"
+            output_msg = f"Response to message: {input_msg}"
             udp_listener.send_text_msg(endpoint, output_msg)
             print(f"{color}{output_msg} send to {endpoint.address}:{endpoint.port}{Style.RESET_ALL}")
     except KeyboardInterrupt:

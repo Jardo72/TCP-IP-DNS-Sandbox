@@ -18,6 +18,7 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from os import getpid
 
 from commons import open_multicast_subscriber
 
@@ -31,7 +32,7 @@ def create_cmd_line_args_parser() -> ArgumentParser:
 
     parser.add_argument(
         "address",
-        help="the IP address the multicast group the consumer will read messages from (e.g. 224.0.0.1)"
+        help="the IP address the multicast group the consumer will read messages from (e.g. 224.0.1.1)"
     )
     parser.add_argument(
         "port",
@@ -50,7 +51,7 @@ def parse_cmd_line_args() -> Namespace:
 
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
-    print(f"Multicast subscriber is going to consume from {cmd_line_args.address}:{cmd_line_args.port}")
+    print(f"Multicast subscriber (PID = {getpid()}) is going to consume from {cmd_line_args.address}:{cmd_line_args.port}")
     try:
         subscriber = open_multicast_subscriber(cmd_line_args.address, cmd_line_args.port, 4096)
         while True:
