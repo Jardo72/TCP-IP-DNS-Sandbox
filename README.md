@@ -8,3 +8,19 @@ Set of demo/experimental applications for demonstration of TCP/IP and DNS implem
 | -------------------- | ------------------------------------------------------------------------ |
 | [TCP-UDP](./TCP-UDP) | Demonstration of TCP and UDP communication (incl. broadcast & multicast) |
 | [DNS](./DNS)         | Demonstration of DNS queries based on the dnspython module               |
+
+## AWS Infrastructure
+The [AWS-Infrastructure](./AWS-Infrastructure) subdirectory contains a Terraform configuration that can be used to provision an AWS infrastructure suitable for the demonstration of the [TCP-UDP](./TCP-UDP) demo applications.
+
+## Cheat Sheets
+| Tool        | Cheat Sheet    |
+| ----------- | -------------- |
+| nc          |                |
+| netstat     |                |
+| ss          |                |
+| tcpdump     |                |
+
+
+See also:
+* [Markdown to PDF](https://www.pdfforge.org/online/en/markdown-to-pdf)
+* [Comparison Between ss vs netstat Commands](https://tecadmin.net/comparison-between-ss-vs-netstat-commands/)
