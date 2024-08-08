@@ -36,24 +36,26 @@ provider "aws" {
 }
 
 module "s3" {
-    source = "./modules/s3"
+  source               = "./modules/s3"
+  resource_name_prefix = var.resource_name_prefix
+  tags                 = var.tags
 }
 
 data "aws_availability_zones" "available" {}
 
 module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "5.12.0"
-  name                              = "${var.resource_name_prefix}-VPC-#1"
-  cidr                              = var.vpc_cidr_block
-  azs                               = data.aws_availability_zones.available.names
-  private_subnets                   = [cidrsubnet(var.vpc_cidr_block, 4, 0)]
-  enable_nat_gateway                = true
+  source             = "terraform-aws-modules/vpc/aws"
+  version            = "5.12.0"
+  name               = "${var.resource_name_prefix}-VPC-#1"
+  cidr               = var.vpc_cidr_block
+  azs                = data.aws_availability_zones.available.names
+  private_subnets    = [cidrsubnet(var.vpc_cidr_block, 4, 0)]
+  enable_nat_gateway = true
 }
 
 module "ec2" {
-    source = "./modules/ec2"
-    ec2_instance_type = var.ec2_instance_type
+  source               = "./modules/ec2"
+  ec2_instance_type    = var.ec2_instance_type
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
 }
