@@ -26,9 +26,28 @@ data "aws_ami" "latest_amazon_linux_ami" {
   }
 }
 
-// TODO:
-// - we will also need access to the S3 bucket for transfer of network captures
-// - special IAM policy will be needed for that purpose
+resource "aws_iam_policy" "capture_transfer_bucket_access_policy" {
+  name = "${var.resource_name_prefix}-CaptureTransfer-Bucket-AccessPolicy"
+  policy = jsonencode({
+    Version : "2012-10-17",
+    Statement : [
+      {
+        Sid : "AllowS3BucketAccess",
+        Effect : "Allow",
+        Action : [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+        ],
+        Resource : [
+            var.capture_transfer_bucket_arn,
+            "${var.capture_transfer_bucket_arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role" "ec2_iam_role" {
   name = "${var.resource_name_prefix}-EC2-IAM-Role"
   assume_role_policy = jsonencode({
@@ -46,7 +65,8 @@ resource "aws_iam_role" "ec2_iam_role" {
   })
   managed_policy_arns = [
     # needed in order to be able to connect to the EC2 instances via the SSM Session Manager
-    "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+    "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
+    aws_iam_policy.capture_transfer_bucket_access_policy.arn
   ]
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2-IAM-Role"
