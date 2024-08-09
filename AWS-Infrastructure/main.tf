@@ -52,6 +52,7 @@ module "ec2" {
   source                      = "./modules/ec2"
   vpc_id                      = module.vpc.vpc_id
   vpc_cidr_block              = var.vpc_cidr_block
+  subnet_id                   = module.vpc.subnet_id
   ec2_instance_type           = var.ec2_instance_type
   capture_transfer_bucket_arn = module.s3.capture_transfer_bucket_arn
   resource_name_prefix        = var.resource_name_prefix

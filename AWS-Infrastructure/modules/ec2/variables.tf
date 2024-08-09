@@ -27,6 +27,11 @@ variable "vpc_cidr_block" {
   type        = string
 }
 
+variable "subnet_id" {
+  description = "ID of the subnet where the EC2 instances are to be launched"
+  type        = string
+}
+
 variable "ec2_instance_type" {
   description = "Instance type of the EC2 instances to be started"
   type        = string

@@ -19,12 +19,10 @@
 
 output "vpc_id" {
   description = "VPC ID of the provisioned VPC"
-  value       = "TODO"
-  // value       = module.vpc.vpc_id
+  value       = module.vpc.vpc_id
 }
 
-output "vpc_subnet_id" {
+output "subnet_id" {
   description = "Subnet ID of the private subnet within the VPC"
-  value       = "TODO"
-  // value       = vpc.tcp_ip_demo_vpc.private_subnets[0]
+  value       = module.vpc.private_subnets[0]
 }
