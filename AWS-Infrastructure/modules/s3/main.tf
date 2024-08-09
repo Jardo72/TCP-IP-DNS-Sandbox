@@ -16,3 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+resource "aws_s3_bucket" "bucket" {
+  bucket = var.capture_transfer_bucket
+  tags   = var.tags
+}

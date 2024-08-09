@@ -22,6 +22,11 @@ variable "aws_region" {
   type        = string
 }
 
+variable "capture_transfer_bucket" {
+  description = "Name of the S3 bucket for the transfer of network captures from EC2 instances to localhost"
+  type        = string
+}
+
 variable "vpc_cidr_block" {
   description = "CIDR block for the VPC"
   type        = string

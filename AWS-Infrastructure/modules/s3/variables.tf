@@ -17,8 +17,8 @@
 # limitations under the License.
 #
 
-variable "resource_name_prefix" {
-  description = "Prefix for the names to be applied to the provisioned resources"
+variable "capture_transfer_bucket" {
+  description = "Name of the S3 bucket for the transfer of network captures from EC2 instances to localhost"
   type        = string
 }
 

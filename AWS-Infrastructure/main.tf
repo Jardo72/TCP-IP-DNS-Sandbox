@@ -36,11 +36,13 @@ provider "aws" {
 }
 
 module "s3" {
-  source               = "./modules/s3"
-  resource_name_prefix = var.resource_name_prefix
-  tags                 = var.tags
+  source                  = "./modules/s3"
+  capture_transfer_bucket = var.capture_transfer_bucket
+  tags                    = var.tags
 }
 
+// TODO: it might make sense to move this to a module
+//---------------------------------------------------------------------------
 data "aws_availability_zones" "available" {}
 
 module "vpc" {
@@ -50,8 +52,11 @@ module "vpc" {
   cidr               = var.vpc_cidr_block
   azs                = data.aws_availability_zones.available.names
   private_subnets    = [cidrsubnet(var.vpc_cidr_block, 4, 0)]
+  public_subnets     = [cidrsubnet(var.vpc_cidr_block, 4, 1)]
   enable_nat_gateway = true
 }
+// end of block which will eventually be moved to a module
+//---------------------------------------------------------------------------
 
 module "ec2" {
   source               = "./modules/ec2"
