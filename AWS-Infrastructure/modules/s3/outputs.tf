@@ -16,3 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+output "capture_transfer_bucket_id" {
+  value = aws_s3_bucket.bucket.id
+}
+
+output "capture_transfer_bucket_arn" {
+  value = aws_s3_bucket.bucket.arn
+}

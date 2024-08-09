@@ -59,8 +59,11 @@ module "vpc" {
 //---------------------------------------------------------------------------
 
 module "ec2" {
-  source               = "./modules/ec2"
-  ec2_instance_type    = var.ec2_instance_type
-  resource_name_prefix = var.resource_name_prefix
-  tags                 = var.tags
+  source                      = "./modules/ec2"
+  vpc_id                      = "TODO"
+  vpc_cidr_block              = "TODO"
+  ec2_instance_type           = var.ec2_instance_type
+  capture_transfer_bucket_arn = module.s3.capture_transfer_bucket_arn
+  resource_name_prefix        = var.resource_name_prefix
+  tags                        = var.tags
 }

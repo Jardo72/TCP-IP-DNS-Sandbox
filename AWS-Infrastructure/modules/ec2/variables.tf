@@ -17,10 +17,25 @@
 # limitations under the License.
 #
 
+variable "vpc_id" {
+  description = "VPC ID of the VPC where the EC2 instances are to be launched"
+  type        = string
+}
+
+variable "vpc_cidr_block" {
+  description = "CIDR block for the VPC where the EC2 instances are to be launched"
+  type        = string
+}
+
 variable "ec2_instance_type" {
   description = "Instance type of the EC2 instances to be started"
   type        = string
   default     = "t2.micro"
+}
+
+variable "capture_transfer_bucket_arn" {
+  description = "Name of the S3 bucket for the transfer of network captures from EC2 instances to localhost"
+  type        = string
 }
 
 variable "resource_name_prefix" {
