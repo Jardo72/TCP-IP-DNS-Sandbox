@@ -22,7 +22,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~>5.60.0"
+      version = "~>5.62.0"
     }
     template = {
       source  = "hashicorp/template"
@@ -42,8 +42,10 @@ module "s3" {
 }
 
 module "vpc" {
-  source         = "./modules/vpc"
-  vpc_cidr_block = var.vpc_cidr_block
+  source               = "./modules/vpc"
+  vpc_cidr_block       = var.vpc_cidr_block
+  resource_name_prefix = var.resource_name_prefix
+  tags                 = var.tags
 }
 
 module "ec2" {

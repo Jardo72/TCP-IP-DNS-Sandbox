@@ -16,10 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
- 
+
 data "aws_availability_zones" "available" {}
 
-resource "vpc" "tcp_ip_demo_vpc" {
+module "vpc" {
   source             = "terraform-aws-modules/vpc/aws"
   version            = "5.12.0"
   name               = "${var.resource_name_prefix}-VPC"
