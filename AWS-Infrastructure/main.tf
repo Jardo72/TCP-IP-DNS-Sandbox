@@ -22,7 +22,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~>5.61.0"
+      version = "~>5.60.0"
     }
     template = {
       source  = "hashicorp/template"
@@ -41,27 +41,15 @@ module "s3" {
   tags                    = var.tags
 }
 
-// TODO: it might make sense to move this to a module
-//---------------------------------------------------------------------------
-data "aws_availability_zones" "available" {}
-
 module "vpc" {
-  source             = "terraform-aws-modules/vpc/aws"
-  version            = "5.12.0"
-  name               = "${var.resource_name_prefix}-VPC-#1"
-  cidr               = var.vpc_cidr_block
-  azs                = data.aws_availability_zones.available.names
-  private_subnets    = [cidrsubnet(var.vpc_cidr_block, 4, 0)]
-  public_subnets     = [cidrsubnet(var.vpc_cidr_block, 4, 1)]
-  enable_nat_gateway = true
+  source         = "./modules/vpc"
+  vpc_cidr_block = var.vpc_cidr_block
 }
-// end of block which will eventually be moved to a module
-//---------------------------------------------------------------------------
 
 module "ec2" {
   source                      = "./modules/ec2"
-  vpc_id                      = "TODO"
-  vpc_cidr_block              = "TODO"
+  vpc_id                      = module.vpc.vpc_id
+  vpc_cidr_block              = var.vpc_cidr_block
   ec2_instance_type           = var.ec2_instance_type
   capture_transfer_bucket_arn = module.s3.capture_transfer_bucket_arn
   resource_name_prefix        = var.resource_name_prefix
