@@ -161,3 +161,27 @@ resource "aws_security_group" "ec2_client_security_group" {
     Name = "${var.resource_name_prefix}-EC2-Client-SG"
   })
 }
+
+resource "aws_instance" "ec2_instance_server" {
+  ami                    = data.aws_ami.latest_amazon_linux_ami.id
+  instance_type          = var.ec2_instance_type
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = [aws_security_group.ec2_server_security_group.id]
+  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  user_data              = templatefile("${path.module}/ec2-user-data.tftpl", {})
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-EC2-Server"
+  })
+}
+
+resource "aws_instance" "ec2_instance_client" {
+  ami                    = data.aws_ami.latest_amazon_linux_ami.id
+  instance_type          = var.ec2_instance_type
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = [aws_security_group.ec2_client_security_group.id]
+  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  user_data              = templatefile("${path.module}/ec2-user-data.tftpl", {})
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-EC2-Client"
+  })
+}
