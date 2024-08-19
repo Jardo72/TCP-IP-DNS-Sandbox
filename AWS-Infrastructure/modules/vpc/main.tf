@@ -25,7 +25,7 @@ module "vpc" {
   name               = "${var.resource_name_prefix}-VPC"
   cidr               = var.vpc_cidr_block
   azs                = data.aws_availability_zones.available.names
-  private_subnets    = [cidrsubnet(var.vpc_cidr_block, 4, 0)]
-  public_subnets     = [cidrsubnet(var.vpc_cidr_block, 4, 1)]
+  private_subnets    = [cidrsubnet(var.vpc_cidr_block, 8, 0)]
+  public_subnets     = [cidrsubnet(var.vpc_cidr_block, 8, 1)]
   enable_nat_gateway = true
 }

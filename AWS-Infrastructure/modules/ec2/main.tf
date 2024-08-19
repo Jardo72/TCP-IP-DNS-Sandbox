@@ -170,7 +170,9 @@ resource "aws_security_group" "ec2_client_security_group" {
 }
 
 resource "aws_instance" "ec2_instance_server" {
-  ami                    = data.aws_ami.latest_amazon_linux_ami.id
+  ami = "ami-00060fac2f8c42d30"
+  // TODO: remove??? chances are we do not need this
+  // ami                    = data.aws_ami.latest_amazon_linux_ami.id
   instance_type          = var.ec2_instance_type
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_server_security_group.id]

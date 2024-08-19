@@ -16,3 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+output "subnet_cidr" {
+  description = "CIDR block of the private subnet within the VPC"
+  value       = module.vpc.subnet_cidr
+}

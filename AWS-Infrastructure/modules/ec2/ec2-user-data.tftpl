@@ -23,19 +23,8 @@ yum update -y
 yum install git -y
 yum install net-tools -y
 yum install tcpdump -y
-yum install openssl-devel bzip2-devel libffi-devel -y
-yum groupinstall "Development Tools" -y
 
 cd /opt
 mkdir ./tcp-ip-sandbox
 cd ./tcp-ip-sandbox
 git clone https://github.com/Jardo72/TCP-IP-DNS-Sandbox.git
-
-# see also https://linuxstans.com/how-to-install-python-centos/
-wget https://www.python.org/ftp/python/3.10.2/Python-3.10.2.tgz
-tar -xzf Python-3.10.2.tgz
-cd Python-3.10.2
-./configure --enable-optimizations
-make altinstall
-
-
