@@ -17,13 +17,8 @@
 # limitations under the License.
 #
 
-data "aws_ami" "latest_amazon_linux_ami" {
-  owners      = ["137112412989"]
-  most_recent = true
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
+locals {
+  ami_id = "ami-00060fac2f8c42d30"
 }
 
 resource "aws_iam_policy" "capture_transfer_bucket_access_policy" {
@@ -170,9 +165,7 @@ resource "aws_security_group" "ec2_client_security_group" {
 }
 
 resource "aws_instance" "ec2_instance_server" {
-  ami = "ami-00060fac2f8c42d30"
-  // TODO: remove??? chances are we do not need this
-  // ami                    = data.aws_ami.latest_amazon_linux_ami.id
+  ami                    = local.ami_id
   instance_type          = var.ec2_instance_type
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_server_security_group.id]
@@ -184,7 +177,7 @@ resource "aws_instance" "ec2_instance_server" {
 }
 
 resource "aws_instance" "ec2_instance_client_1" {
-  ami                    = data.aws_ami.latest_amazon_linux_ami.id
+  ami                    = local.ami_id
   instance_type          = var.ec2_instance_type
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_client_security_group.id]
@@ -195,9 +188,8 @@ resource "aws_instance" "ec2_instance_client_1" {
   })
 }
 
-/* TODO:
 resource "aws_instance" "ec2_instance_client_2" {
-  ami                    = data.aws_ami.latest_amazon_linux_ami.id
+  ami                    = local.ami_id
   instance_type          = var.ec2_instance_type
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_client_security_group.id]
@@ -209,7 +201,7 @@ resource "aws_instance" "ec2_instance_client_2" {
 }
 
 resource "aws_instance" "ec2_instance_client_3" {
-  ami                    = data.aws_ami.latest_amazon_linux_ami.id
+  ami                    = local.ami_id
   instance_type          = var.ec2_instance_type
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_client_security_group.id]
@@ -219,4 +211,3 @@ resource "aws_instance" "ec2_instance_client_3" {
     Name = "${var.resource_name_prefix}-EC2-Client-#3"
   })
 }
-*/
