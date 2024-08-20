@@ -16,3 +16,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+output "server_ec2_instance_id" {
+  description = "Instance ID of the EC2 instance serving as server"
+  value       = aws_instance.ec2_instance_server.id
+}
+
+output "client_1_ec2_instance_id" {
+  description = "Instance ID of the EC2 instance serving as client #1"
+  value       = aws_instance.ec2_instance_client_1.id
+}
+
+output "client_2_ec2_instance_id" {
+  description = "Instance ID of the EC2 instance serving as client #2"
+  value       = aws_instance.ec2_instance_client_2.id
+}
+
+output "client_3_ec2_instance_id" {
+  description = "Instance ID of the EC2 instance serving as client #3"
+  value       = aws_instance.ec2_instance_client_3.id
+}

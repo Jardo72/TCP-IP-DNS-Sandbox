@@ -17,7 +17,27 @@
 # limitations under the License.
 #
 
-output "subnet_cidr" {
-  description = "CIDR block of the private subnet within the VPC"
+output "ec2_subnet_cidr" {
+  description = "CIDR block of the private subnet within the VPC where the EC2 instances are running"
   value       = module.vpc.subnet_cidr
+}
+
+output "server_ec2_instance_id" {
+  description = "Instance ID of the EC2 instance serving as server"
+  value       = module.ec2.server_ec2_instance_id
+}
+
+output "client_1_ec2_instance_id" {
+  description = "Instance ID of the EC2 instance serving as client #1"
+  value       = module.ec2.client_1_ec2_instance_id
+}
+
+output "client_2_ec2_instance_id" {
+  description = "Instance ID of the EC2 instance serving as client #2"
+  value       = module.ec2.client_2_ec2_instance_id
+}
+
+output "client_3_ec2_instance_id" {
+  description = "Instance ID of the EC2 instance serving as client #3"
+  value       = module.ec2.client_3_ec2_instance_id
 }
