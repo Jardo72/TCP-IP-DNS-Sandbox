@@ -27,9 +27,19 @@ output "server_ec2_instance_id" {
   value       = module.ec2.server_ec2_instance_id
 }
 
+output "server_ec2_instance_ip_address" {
+  description = "IP address of the EC2 instance serving as server"
+  value       = module.ec2.server_ec2_instance_ip_address
+}
+
 output "client_1_ec2_instance_id" {
   description = "Instance ID of the EC2 instance serving as client #1"
   value       = module.ec2.client_1_ec2_instance_id
+}
+
+output "client_1_ec2_instance_ip_address" {
+  description = "IP address of the EC2 instance serving as client #1"
+  value       = module.ec2.client_1_ec2_instance_ip_address
 }
 
 output "client_2_ec2_instance_id" {
@@ -37,7 +47,17 @@ output "client_2_ec2_instance_id" {
   value       = module.ec2.client_2_ec2_instance_id
 }
 
+output "client_2_ec2_instance_ip_address" {
+  description = "IP address of the EC2 instance serving as client #2"
+  value       = module.ec2.client_2_ec2_instance_ip_address
+}
+
 output "client_3_ec2_instance_id" {
   description = "Instance ID of the EC2 instance serving as client #3"
   value       = module.ec2.client_3_ec2_instance_id
+}
+
+output "client_3_ec2_instance_ip_address" {
+  description = "IP address of the EC2 instance serving as client #3"
+  value       = module.ec2.client_3_ec2_instance_ip_address
 }
