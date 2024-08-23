@@ -61,3 +61,8 @@ output "client_3_ec2_instance_ip_address" {
   description = "IP address of the EC2 instance serving as client #3"
   value       = module.ec2.client_3_ec2_instance_ip_address
 }
+
+output "application_port" {
+  description = "TCP and UDP port the applications will use"
+  value       = var.application_port
+}

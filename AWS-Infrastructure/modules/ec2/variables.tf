@@ -38,6 +38,11 @@ variable "ec2_instance_type" {
   default     = "t2.micro"
 }
 
+variable "application_port" {
+  description = "TCP and UDP port the applications will use"
+  type        = number
+}
+
 variable "capture_transfer_bucket_arn" {
   description = "Name of the S3 bucket for the transfer of network captures from EC2 instances to localhost"
   type        = string

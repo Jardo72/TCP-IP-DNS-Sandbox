@@ -89,10 +89,17 @@ resource "aws_security_group" "ec2_server_security_group" {
   }
   ingress {
     protocol    = "tcp"
-    from_port   = 1234
-    to_port     = 1234
+    from_port   = var.application_port
+    to_port     = var.application_port
     cidr_blocks = [var.vpc_cidr_block]
-    description = "Allow inbound TCP traffic to port 1234 from any host within this VPC"
+    description = "Allow inbound TCP traffic to application port from any host within this VPC"
+  }
+  ingress {
+    protocol    = "udp"
+    from_port   = var.application_port
+    to_port     = var.application_port
+    cidr_blocks = [var.vpc_cidr_block]
+    description = "Allow inbound UDP traffic to application port from any host within this VPC"
   }
   egress {
     protocol    = "icmp"
@@ -107,13 +114,6 @@ resource "aws_security_group" "ec2_server_security_group" {
     to_port     = 443
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow outbound HTTPS traffic (needed for the SSM Agent)"
-  }
-  egress {
-    protocol    = "udp"
-    from_port   = 1234
-    to_port     = 1234
-    cidr_blocks = [var.vpc_cidr_block]
-    description = "Allow outbound UDP traffic to port 1234 to any host within this VPC"
   }
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2-Server-SG"
@@ -131,13 +131,6 @@ resource "aws_security_group" "ec2_client_security_group" {
     cidr_blocks = [var.vpc_cidr_block]
     description = "Allow inbound ICMP traffic from any host within this VPC"
   }
-  ingress {
-    protocol    = "udp"
-    from_port   = 1234
-    to_port     = 1234
-    cidr_blocks = [var.vpc_cidr_block]
-    description = "Allow inbound UDP traffic to port 1234 from any host within this VPC"
-  }
   egress {
     protocol    = "icmp"
     from_port   = -1
@@ -154,10 +147,17 @@ resource "aws_security_group" "ec2_client_security_group" {
   }
   egress {
     protocol    = "tcp"
-    from_port   = 1234
-    to_port     = 1234
+    from_port   = var.application_port
+    to_port     = var.application_port
     cidr_blocks = [var.vpc_cidr_block]
-    description = "Allow outbound TCP traffic to port 1234 to any host within this VPC"
+    description = "Allow outbound TCP traffic to application port to any host within this VPC"
+  }
+  egress {
+    protocol    = "udp"
+    from_port   = var.application_port
+    to_port     = var.application_port
+    cidr_blocks = [var.vpc_cidr_block]
+    description = "Allow outbound UDP traffic to application port to any host within this VPC"
   }
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2-Client-SG"

@@ -39,6 +39,12 @@ variable "ec2_instance_type" {
   default     = "t2.micro"
 }
 
+variable "application_port" {
+  description = "TCP and UDP port the applications will use"
+  type        = number
+  default     = 1234
+}
+
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"
   type        = string
