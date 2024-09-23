@@ -41,6 +41,7 @@ from socket import (
 )
 from struct import calcsize, pack, unpack
 from time import sleep
+from typing import Optional
 
 from colorama import Fore
 
@@ -101,7 +102,7 @@ class TCPSocket:
         self._socket.sendall(payload)
         return len(header) + len(payload)
 
-    def recv_text_msg(self) -> str | None:
+    def recv_text_msg(self) -> Optional[str]:
         length, msg_type = self._recv_header()
         if msg_type != MessageType.TEXT:
             raise ValueError(f"Unexpected message type: {msg_type}.")

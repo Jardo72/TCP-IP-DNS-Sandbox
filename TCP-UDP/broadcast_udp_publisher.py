@@ -29,7 +29,7 @@ def create_cmd_line_args_parser() -> ArgumentParser:
 
     parser.add_argument(
         "address",
-        help="the broadcast IP address the publisher will send messages to"
+        help="the broadcast IP address the publisher will send messages to (e.g. 192.168.0.255 - depends on your network address)"
     )
     parser.add_argument(
         "port",
