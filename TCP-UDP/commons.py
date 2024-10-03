@@ -98,8 +98,7 @@ class TCPSocket:
 
     def _send_msg(self, msg_type: MessageType, payload: bytes) -> int:
         header = pack(_HEADER_FORMAT, len(payload), msg_type)
-        self._socket.sendall(header)
-        self._socket.sendall(payload)
+        self._socket.sendall(header + payload)
         return len(header) + len(payload)
 
     def recv_text_msg(self) -> Optional[str]:
