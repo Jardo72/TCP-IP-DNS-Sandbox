@@ -172,8 +172,8 @@ class UDPSocket:
         self._socket.close()
 
 
-def open_tcp_listener(address: str, port: int) -> socket:
-    return create_server((address, port), family=AF_INET)
+def open_tcp_listener(address: str, port: int, reuse_port: bool = False) -> socket:
+    return create_server((address, port), family=AF_INET, reuse_port=reuse_port)
 
 
 def open_tcp_connection(address: str, port: int, timeout_sec: int) -> TCPSocket:
@@ -209,7 +209,7 @@ def open_multicast_subscriber(address: str, port: int, msg_size: int = 4096) -> 
     return UDPSocket(subscriber, msg_size)
 
 
-def random_sleep(min_sec: int, max_sec:int) -> float:
+def random_sleep(min_sec: int, max_sec:int) -> None:
     duration_sec = min_sec + random() * (max_sec - min_sec)
     sleep(duration_sec)
 

@@ -57,6 +57,13 @@ def create_cmd_line_args_parser() -> ArgumentParser:
         help="the TCP port the server has to bind to",
         type=int
     )
+    parser.add_argument(
+        "-r", "--reuse-port",
+        dest="reuse_port",
+        default=False,
+        action="store_true",
+        help="if specified, the SO_REUSEPORT socket option will be set on the server socket"
+    )
 
     return parser
 
@@ -64,6 +71,8 @@ def create_cmd_line_args_parser() -> ArgumentParser:
 def parse_cmd_line_args() -> Namespace:
     parser = create_cmd_line_args_parser()
     params = parser.parse_args()
+    if not (1025 <= params.port <= 65535):
+        parser.error("Port must be between 1025 and 65535.")
     return params
 
 
@@ -73,7 +82,7 @@ def main() -> None:
     print(f"TCP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
 
     try:
-        listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port)
+        listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port, cmd_line_args.reuse_port)
         while True:
             connection, (remote_address, remote_port) = listener.accept()
             print(f"Client connection accepted from ({remote_address}:{remote_port})...")
