@@ -52,11 +52,6 @@ variable "client_3_ec2_instance_ip_address" {
   type        = string
 }
 
-variable "client_4_ec2_instance_ip_address" {
-  description = "IP address of the EC2 instance serving as client #4"
-  type        = string
-}
-
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"
   type        = string

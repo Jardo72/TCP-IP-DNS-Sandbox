@@ -59,11 +59,3 @@ resource "aws_route53_record" "client_3_ec2_instance_record" {
   ttl     = var.record_ttl
   records = [var.client_3_ec2_instance_ip_address]
 }
-
-resource "aws_route53_record" "client_4_ec2_instance_record" {
-  zone_id = aws_route53_zone.private_hosted_zone.zone_id
-  name    = "client-4.${var.hosted_zone_name}"
-  type    = "A"
-  ttl     = var.record_ttl
-  records = [var.client_4_ec2_instance_ip_address]
-}
