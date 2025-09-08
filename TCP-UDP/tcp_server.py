@@ -18,6 +18,7 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from itertools import count
 from os import getpid
 from threading import Thread, current_thread
 
@@ -29,8 +30,10 @@ from commons import TCPSocket, open_tcp_listener, next_color
 
 class ClientThread(Thread):
 
+    seq = count(1)
+
     def __init__(self, socket: TCPSocket) -> None:
-        super().__init__()
+        super().__init__(name=f"Worker-{next(self.seq)}")
         self._socket = socket
         self._color = next_color()
 
@@ -43,6 +46,10 @@ class ClientThread(Thread):
                 print(f"{self._color}{current_thread().name}: {output_msg}{Style.RESET_ALL}")
         except EOFError:
             print(f"{self._color}{current_thread().name}: EOF - client has disconnected{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{self._color}{current_thread().name}: Unexpected error: {str(e)}{Style.RESET_ALL}")
+        finally:
+            self._socket.close()
 
 
 def create_cmd_line_args_parser() -> ArgumentParser:
@@ -54,7 +61,7 @@ def create_cmd_line_args_parser() -> ArgumentParser:
     )
     parser.add_argument(
         "port",
-        help="the TCP port the server has to bind to",
+        help="the TCP port the server has to bind to (between 1024 and 65535)",
         type=int
     )
     parser.add_argument(
@@ -71,8 +78,8 @@ def create_cmd_line_args_parser() -> ArgumentParser:
 def parse_cmd_line_args() -> Namespace:
     parser = create_cmd_line_args_parser()
     params = parser.parse_args()
-    if not (1025 <= params.port <= 65535):
-        parser.error("Port must be between 1025 and 65535.")
+    if not (1024 <= params.port <= 65535):
+        parser.error("Port must be between 1024 and 65535.")
     return params
 
 
