@@ -87,6 +87,7 @@ def main() -> None:
     colorama_init()
     cmd_line_args = parse_cmd_line_args()
     print(f"TCP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
+    listener = None
 
     try:
         listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port, cmd_line_args.reuse_port)
@@ -97,6 +98,11 @@ def main() -> None:
             client_thread.start()
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
+    except Exception as e:
+        print(f"Exception caught: {str(e)}")
+    finally:
+        if listener:
+            listener.close()
 
 
 if __name__ == "__main__":

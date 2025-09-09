@@ -41,7 +41,7 @@ from socket import (
 )
 from struct import calcsize, pack, unpack
 from time import sleep
-from typing import Optional
+from typing import Any, Optional
 
 from colorama import Fore
 
@@ -92,7 +92,7 @@ class TCPSocket:
         payload = bytes(msg, _ENCODING)
         return self._send_msg(MessageType.TEXT, payload)
 
-    def send_json_msg(self, msg: dict[str, any]) -> int:
+    def send_json_msg(self, msg: dict[str, Any]) -> int:
         payload = bytes(dumps(msg), _ENCODING)
         return self._send_msg(MessageType.JSON, payload)
 
@@ -108,7 +108,7 @@ class TCPSocket:
         payload = self._socket.recv(length)
         return payload.decode(_ENCODING)
 
-    def recv_json_msg(self) -> dict[str, any]:
+    def recv_json_msg(self) -> dict[str, Any]:
         length, msg_type = self._recv_header()
         if msg_type != MessageType.JSON:
             raise ValueError(f"Unexpected message type: {msg_type}.")
@@ -135,7 +135,7 @@ class UDPSocket:
         payload = bytes(dumps(msg), _ENCODING)
         self._send_msg(dst, MessageType.TEXT, payload)
 
-    def send_json_msg(self, dst: Endpoint, msg: dict[str, any]) -> None:
+    def send_json_msg(self, dst: Endpoint, msg: dict[str, Any]) -> None:
         payload = bytes(dumps(msg), _ENCODING)
         self._send_msg(dst, MessageType.JSON, payload)
 
@@ -157,7 +157,7 @@ class UDPSocket:
             payload.decode(_ENCODING)
         )
 
-    def recv_json_msg(self) -> tuple[Endpoint, dict[str, any]]:
+    def recv_json_msg(self) -> tuple[Endpoint, dict[str, Any]]:
         datagram, (address, port) = self._socket.recvfrom(self._msg_size)
         msg_length, msg_type = unpack(_HEADER_FORMAT, datagram[0:_HEADER_SIZE])
         if msg_type != MessageType.JSON:
