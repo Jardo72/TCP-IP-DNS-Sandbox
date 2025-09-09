@@ -17,8 +17,13 @@
 # limitations under the License.
 #
 
-locals {
-  ami_id = "ami-00060fac2f8c42d30"
+data "aws_ami" "amazon_linux_2023_ami" {
+  most_recent = true
+  owners      = [ "137112412989" ]
+  filter {
+    name   = "name"
+    values = [ "al2023-ami-*-kernel-*-x86_64" ]
+  }
 }
 
 resource "aws_iam_policy" "capture_transfer_bucket_access_policy" {
@@ -165,7 +170,7 @@ resource "aws_security_group" "ec2_client_security_group" {
 }
 
 resource "aws_instance" "ec2_instance_server" {
-  ami                    = local.ami_id
+  ami                    = data.aws_ami.amazon_linux_2023_ami.id
   instance_type          = var.ec2_instance_type
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_server_security_group.id]
@@ -177,7 +182,7 @@ resource "aws_instance" "ec2_instance_server" {
 }
 
 resource "aws_instance" "ec2_instance_client_1" {
-  ami                    = local.ami_id
+  ami                    = data.aws_ami.amazon_linux_2023_ami.id
   instance_type          = var.ec2_instance_type
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_client_security_group.id]
@@ -189,7 +194,7 @@ resource "aws_instance" "ec2_instance_client_1" {
 }
 
 resource "aws_instance" "ec2_instance_client_2" {
-  ami                    = local.ami_id
+  ami                    = data.aws_ami.amazon_linux_2023_ami.id
   instance_type          = var.ec2_instance_type
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_client_security_group.id]
@@ -201,7 +206,7 @@ resource "aws_instance" "ec2_instance_client_2" {
 }
 
 resource "aws_instance" "ec2_instance_client_3" {
-  ami                    = local.ami_id
+  ami                    = data.aws_ami.amazon_linux_2023_ami.id
   instance_type          = var.ec2_instance_type
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_client_security_group.id]
