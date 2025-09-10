@@ -17,10 +17,17 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    Namespace,
+    RawTextHelpFormatter,
+)
 from os import getpid
 
-from commons import TCPSocket, open_tcp_listener
+from commons import (
+    TCPSocket,
+    open_tcp_listener,
+)
 
 
 def create_cmd_line_args_parser() -> ArgumentParser:
@@ -48,6 +55,7 @@ def parse_cmd_line_args() -> Namespace:
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     print(f"TCP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
+    listener = None
     try:
         listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port)
         connection, (remote_address, remote_port) = listener.accept()
@@ -59,6 +67,11 @@ def main() -> None:
             client_socket.recv_json_msg()
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
+    except Exception as e:
+        print(f"Exception caught: {str(e)}")
+    finally:
+        if listener:
+            listener.close()
 
 
 if __name__ == "__main__":
