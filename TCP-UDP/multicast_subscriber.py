@@ -17,7 +17,11 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    Namespace,
+    RawTextHelpFormatter,
+)
 from os import getpid
 
 from commons import open_multicast_subscriber
@@ -52,6 +56,7 @@ def parse_cmd_line_args() -> Namespace:
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     print(f"Multicast subscriber (PID = {getpid()}) is going to consume from {cmd_line_args.address}:{cmd_line_args.port}")
+    subscriber = None
     try:
         subscriber = open_multicast_subscriber(cmd_line_args.address, cmd_line_args.port, 4096)
         while True:
@@ -59,6 +64,11 @@ def main() -> None:
             print(f"Message from publisher: '{input_msg}'")
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
+    except Exception as e:
+        print(f"Exception caught: {str(e)}")
+    finally:
+        if subscriber:
+            subscriber.close()
 
 
 if __name__ == "__main__":

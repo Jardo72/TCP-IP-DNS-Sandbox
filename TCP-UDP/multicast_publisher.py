@@ -57,6 +57,7 @@ def parse_cmd_line_args() -> Namespace:
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     print(f"Multicast publisher (PID = {getpid()}) is going to publish to {cmd_line_args.address}:{cmd_line_args.port}")
+    publisher = None
     try:
         destination = Endpoint(cmd_line_args.address, cmd_line_args.port)
         publisher = open_multicast_publisher(4096)
@@ -69,6 +70,11 @@ def main() -> None:
             i += 1
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
+    except Exception as e:
+        print(f"Exception caught: {str(e)}")
+    finally:
+        if publisher:
+            publisher.close()
 
 
 if __name__ == "__main__":
