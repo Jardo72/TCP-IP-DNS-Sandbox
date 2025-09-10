@@ -17,11 +17,18 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    Namespace,
+    RawTextHelpFormatter,
+)
 from os import getpid
 from uuid import uuid4
 
-from commons import open_tcp_connection, random_sleep
+from commons import (
+    open_tcp_connection,
+    random_sleep,
+)
 
 
 def create_cmd_line_args_parser() -> ArgumentParser:
