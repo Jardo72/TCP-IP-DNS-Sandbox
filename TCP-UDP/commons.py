@@ -18,9 +18,15 @@
 #
 
 from dataclasses import dataclass
-from enum import IntEnum, unique
+from enum import (
+    IntEnum,
+    unique,
+)
 from itertools import cycle
-from json import dumps, loads
+from json import (
+    dumps,
+    loads,
+)
 from random import random
 from socket import (
     create_connection,
@@ -39,9 +45,16 @@ from socket import (
     SO_REUSEADDR,
     SO_SNDBUF,
 )
-from struct import calcsize, pack, unpack
+from struct import (
+    calcsize,
+    pack,
+    unpack,
+)
 from time import sleep
-from typing import Any, Optional
+from typing import (
+    Any,
+    Optional,
+)
 
 from colorama import Fore
 
@@ -61,7 +74,9 @@ _COLORS = cycle([
     Fore.LIGHTRED_EX,
     Fore.LIGHTGREEN_EX,
     Fore.LIGHTBLUE_EX,
+    Fore.LIGHTYELLOW_EX,
     Fore.LIGHTMAGENTA_EX,
+    Fore.LIGHTCYAN_EX,
 ])
 
 
