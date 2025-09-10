@@ -17,15 +17,26 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    Namespace,
+    RawTextHelpFormatter,
+)
 from itertools import count
 from os import getpid
-from threading import Thread, current_thread
+from threading import (
+    Thread,
+    current_thread,
+)
 
 from colorama import init as colorama_init
 from colorama import Style
 
-from commons import TCPSocket, open_tcp_listener, next_color
+from commons import (
+    TCPSocket,
+    open_tcp_listener,
+    next_color,
+)
 
 
 class ClientThread(Thread):
