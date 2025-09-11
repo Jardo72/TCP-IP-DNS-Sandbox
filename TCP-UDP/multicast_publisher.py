@@ -17,10 +17,22 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    Namespace,
+    RawTextHelpFormatter,
+)
+from ipaddress import (
+    IPv4Address,
+    AddressValueError,
+)
 from os import getpid
 
-from commons import Endpoint, open_multicast_publisher, random_sleep
+from commons import (
+    Endpoint,
+    open_multicast_publisher,
+    random_sleep,
+)
 
 
 # see also
@@ -48,9 +60,20 @@ def create_cmd_line_args_parser() -> ArgumentParser:
     return parser
 
 
+def is_multicast_address(address: str) -> bool:
+    try:
+        ip_address = IPv4Address(address)
+        return ip_address.is_multicast
+    except AddressValueError:
+        return False
+
+
 def parse_cmd_line_args() -> Namespace:
     parser = create_cmd_line_args_parser()
     params = parser.parse_args()
+    if not is_multicast_address(params.address):
+        message = f"The specified IP address '{params.address}' is not a valid IPv4 multicast address."
+        parser.error(message)
     return params
 
 
