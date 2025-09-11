@@ -44,7 +44,7 @@ class ClientThread(Thread):
     seq = count(1)
 
     def __init__(self, socket: TCPSocket) -> None:
-        super().__init__(name=f"Worker-{next(self.seq)}")
+        super().__init__(name=f"Worker-{next(self.seq)}", daemon=True)
         self._socket = socket
         self._color = next_color()
 
