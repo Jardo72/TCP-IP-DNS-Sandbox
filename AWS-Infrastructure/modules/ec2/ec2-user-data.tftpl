@@ -19,12 +19,29 @@
 # limitations under the License.
 #
 
-yum update -y
-yum install git -y
-yum install net-tools -y
-yum install tcpdump -y
+###############################################################################
+# install updates
+###############################################################################
+dnf update -y
 
+
+###############################################################################
+# install tools I need for the demo
+###############################################################################
+dnf install git -y
+dnf install net-tools -y
+dnf install tcpdump -y
+
+
+###############################################################################
+# install and start the SSM Agent
+###############################################################################
+dnf install -y amazon-ssm-agent
+systemctl enable --now amazon-ssm-agent
+
+
+###############################################################################
+# clone the Git repo with the TCP/IP Sandbox
+###############################################################################
 cd /opt
-mkdir ./tcp-ip-sandbox
-cd ./tcp-ip-sandbox
 git clone https://github.com/Jardo72/TCP-IP-DNS-Sandbox.git

@@ -32,6 +32,11 @@ output "server_ec2_instance_ip_address" {
   value       = module.ec2.server_ec2_instance_ip_address
 }
 
+output "server_ec2_instance_dns_name" {
+  description = "DNS name of the EC2 instance serving as server"
+  value = module.route53.server_ec2_instance_dns_name
+}
+
 output "client_1_ec2_instance_id" {
   description = "Instance ID of the EC2 instance serving as client #1"
   value       = module.ec2.client_1_ec2_instance_id
@@ -40,6 +45,11 @@ output "client_1_ec2_instance_id" {
 output "client_1_ec2_instance_ip_address" {
   description = "IP address of the EC2 instance serving as client #1"
   value       = module.ec2.client_1_ec2_instance_ip_address
+}
+
+output "client_1_ec2_instance_dns_name" {
+  description = "DNS name of the EC2 instance serving as client #1"
+  value = module.route53.client_1_ec2_instance_dns_name
 }
 
 output "client_2_ec2_instance_id" {
@@ -52,6 +62,11 @@ output "client_2_ec2_instance_ip_address" {
   value       = module.ec2.client_2_ec2_instance_ip_address
 }
 
+output "client_2_ec2_instance_dns_name" {
+  description = "DNS name of the EC2 instance serving as client #2"
+  value = module.route53.client_2_ec2_instance_dns_name
+}
+
 output "client_3_ec2_instance_id" {
   description = "Instance ID of the EC2 instance serving as client #3"
   value       = module.ec2.client_3_ec2_instance_id
@@ -60,6 +75,11 @@ output "client_3_ec2_instance_id" {
 output "client_3_ec2_instance_ip_address" {
   description = "IP address of the EC2 instance serving as client #3"
   value       = module.ec2.client_3_ec2_instance_ip_address
+}
+
+output "client_3_ec2_instance_dns_name" {
+  description = "DNS name of the EC2 instance serving as client #3"
+  value = module.route53.client_3_ec2_instance_dns_name
 }
 
 output "application_port" {

@@ -17,20 +17,34 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    Namespace,
+    RawTextHelpFormatter,
+)
+from itertools import count
 from os import getpid
-from threading import Thread, current_thread
+from threading import (
+    Thread,
+    current_thread,
+)
 
 from colorama import init as colorama_init
 from colorama import Style
 
-from commons import TCPSocket, open_tcp_listener, next_color
+from commons import (
+    TCPSocket,
+    open_tcp_listener,
+    next_color,
+)
 
 
 class ClientThread(Thread):
 
+    seq = count(1)
+
     def __init__(self, socket: TCPSocket) -> None:
-        super().__init__()
+        super().__init__(name=f"Worker-{next(self.seq)}", daemon=True)
         self._socket = socket
         self._color = next_color()
 
@@ -43,6 +57,10 @@ class ClientThread(Thread):
                 print(f"{self._color}{current_thread().name}: {output_msg}{Style.RESET_ALL}")
         except EOFError:
             print(f"{self._color}{current_thread().name}: EOF - client has disconnected{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{self._color}{current_thread().name}: Unexpected error: {str(e)}{Style.RESET_ALL}")
+        finally:
+            self._socket.close()
 
 
 def create_cmd_line_args_parser() -> ArgumentParser:
@@ -54,8 +72,15 @@ def create_cmd_line_args_parser() -> ArgumentParser:
     )
     parser.add_argument(
         "port",
-        help="the TCP port the server has to bind to",
+        help="the TCP port the server has to bind to (between 1024 and 65535)",
         type=int
+    )
+    parser.add_argument(
+        "-r", "--reuse-port",
+        dest="reuse_port",
+        default=False,
+        action="store_true",
+        help="if specified, the SO_REUSEPORT socket option will be set on the server socket"
     )
 
     return parser
@@ -64,6 +89,8 @@ def create_cmd_line_args_parser() -> ArgumentParser:
 def parse_cmd_line_args() -> Namespace:
     parser = create_cmd_line_args_parser()
     params = parser.parse_args()
+    if not (1024 <= params.port <= 65535):
+        parser.error("Port must be between 1024 and 65535.")
     return params
 
 
@@ -71,9 +98,10 @@ def main() -> None:
     colorama_init()
     cmd_line_args = parse_cmd_line_args()
     print(f"TCP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
+    listener = None
 
     try:
-        listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port)
+        listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port, cmd_line_args.reuse_port)
         while True:
             connection, (remote_address, remote_port) = listener.accept()
             print(f"Client connection accepted from ({remote_address}:{remote_port})...")
@@ -81,6 +109,11 @@ def main() -> None:
             client_thread.start()
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
+    except Exception as e:
+        print(f"Exception caught: {str(e)}")
+    finally:
+        if listener:
+            listener.close()
 
 
 if __name__ == "__main__":

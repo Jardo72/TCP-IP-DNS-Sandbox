@@ -17,11 +17,18 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    Namespace,
+    RawTextHelpFormatter,
+)
 from os import getpid
 from uuid import uuid4
 
-from commons import open_tcp_connection, random_sleep
+from commons import (
+    open_tcp_connection,
+    random_sleep,
+)
 
 
 def create_cmd_line_args_parser() -> ArgumentParser:
@@ -71,14 +78,25 @@ def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     client_name = cmd_line_args.client_name or str(uuid4())
     print(f"TCP client (PID = {getpid()}) going to connect to {cmd_line_args.address}:{cmd_line_args.port}")
-    socket = open_tcp_connection(cmd_line_args.address, cmd_line_args.port, cmd_line_args.connect_timeout_sec)
-    for i in range(1, cmd_line_args.msg_count + 1):
-        output_msg = f"Message #{i} from client {client_name}"
-        socket.send_text_msg(output_msg)
-        print(f"Message sent to server: '{output_msg}'")
-        input_msg = socket.recv_text_msg()
-        print(f"Message from server received: '{input_msg}'")
-        random_sleep(min_sec=5, max_sec=25)
+    socket = None
+    try:
+        socket = open_tcp_connection(cmd_line_args.address, cmd_line_args.port, cmd_line_args.connect_timeout_sec)
+        for i in range(1, cmd_line_args.msg_count + 1):
+            output_msg = f"Message #{i} from client {client_name}"
+            socket.send_text_msg(output_msg)
+            print(f"Message sent to server: '{output_msg}'")
+            input_msg = socket.recv_text_msg()
+            print(f"Message from server received: '{input_msg}'")
+            random_sleep(min_sec=5, max_sec=25)
+    except KeyboardInterrupt:
+        print("Keyboard interrupt - exit")
+    except (TimeoutError, ConnectionRefusedError, ConnectionResetError) as e:
+        print(f"{type(e).__name__}: {str(e)}")
+    except Exception as e:
+        print(f"Exception caught: {str(e)}")
+    finally:
+        if socket:
+            socket.close()
 
 
 if __name__ == "__main__":

@@ -17,7 +17,11 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    Namespace,
+    RawTextHelpFormatter,
+)
 from os import getpid
 
 from commons import open_udp_listener
@@ -48,6 +52,7 @@ def parse_cmd_line_args() -> Namespace:
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     print(f"UDP broadcast consumer (PID = {getpid()}) is going to consume from {cmd_line_args.address}:{cmd_line_args.port}")
+    consumer = None
     try:
         consumer = open_udp_listener(cmd_line_args.address, cmd_line_args.port, 4096)
         while True:
@@ -55,6 +60,11 @@ def main() -> None:
             print(f"Message from publisher: {input_msg}")
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
+    except Exception as e:
+        print(f"Exception caught: {str(e)}")
+    finally:
+        if consumer:
+            consumer.close()
 
 
 if __name__ == "__main__":

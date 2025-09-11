@@ -17,44 +17,39 @@
 # limitations under the License.
 #
 
-variable "aws_region" {
-  description = "The AWS region where the resources are to be provisioned"
+variable "vpc_id" {
+  description = "VPC ID of the VPC to associate the private hosted zone with"
   type        = string
-}
-
-variable "capture_transfer_bucket" {
-  description = "Name of the S3 bucket for the transfer of network captures from EC2 instances to localhost"
-  type        = string
-}
-
-variable "vpc_cidr_block" {
-  description = "CIDR block for the VPC"
-  type        = string
-  default     = "10.0.0.0/16"
-}
-
-variable "ec2_instance_type" {
-  description = "Instance type of the EC2 instances to be started"
-  type        = string
-  default     = "t2.micro"
-}
-
-variable "application_port" {
-  description = "TCP and UDP port the applications will use"
-  type        = number
-  default     = 1234
 }
 
 variable "hosted_zone_name" {
   description = "The name of the Route 53 hosted zone to be created"
   type        = string
-  default     = "tcp-ip-sandbox.jch"
 }
 
-variable "route53_record_ttl" {
+variable "record_ttl" {
   description = "TTL (in seconds) for the Route 53 records to be created"
   type        = number
-  default     = 300
+}
+
+variable "server_ec2_instance_ip_address" {
+  description = "IP address of the EC2 instance serving as server"
+  type        = string
+}
+
+variable "client_1_ec2_instance_ip_address" {
+  description = "IP address of the EC2 instance serving as client #1"
+  type        = string
+}
+
+variable "client_2_ec2_instance_ip_address" {
+  description = "IP address of the EC2 instance serving as client #2"
+  type        = string
+}
+
+variable "client_3_ec2_instance_ip_address" {
+  description = "IP address of the EC2 instance serving as client #3"
+  type        = string
 }
 
 variable "resource_name_prefix" {

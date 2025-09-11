@@ -51,10 +51,6 @@ def perform_dns_lookup(dns_name: str, record_type: str) -> None:
         rdtype = dns.rdatatype.to_text(answer.rdtype)
         rdclass = dns.rdataclass.to_text(answer.rdclass)
         
-        # TODO: remove
-        # print(f"Answer = {answer}, type = {type(answer)}")
-        # print(f"type = {rdtype}, class = {rdclass}")
-
         if rdtype in {"A", "AAAA"}:
             print(f"- address = {answer.address}, type = {rdtype}, class = {rdclass}")
         if rdtype in {"MX"}:

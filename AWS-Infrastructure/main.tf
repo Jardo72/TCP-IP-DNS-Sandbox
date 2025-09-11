@@ -59,3 +59,16 @@ module "ec2" {
   resource_name_prefix        = var.resource_name_prefix
   tags                        = var.tags
 }
+
+module "route53" {
+  source                           = "./modules/route53"
+  vpc_id                           = module.vpc.vpc_id
+  hosted_zone_name                 = var.hosted_zone_name
+  record_ttl                       = var.route53_record_ttl
+  server_ec2_instance_ip_address   = module.ec2.server_ec2_instance_ip_address
+  client_1_ec2_instance_ip_address = module.ec2.client_1_ec2_instance_ip_address
+  client_2_ec2_instance_ip_address = module.ec2.client_2_ec2_instance_ip_address
+  client_3_ec2_instance_ip_address = module.ec2.client_3_ec2_instance_ip_address
+  resource_name_prefix             = var.resource_name_prefix
+  tags                             = var.tags
+}

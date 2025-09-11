@@ -18,9 +18,15 @@
 #
 
 from dataclasses import dataclass
-from enum import IntEnum, unique
+from enum import (
+    IntEnum,
+    unique,
+)
 from itertools import cycle
-from json import dumps, loads
+from json import (
+    dumps,
+    loads,
+)
 from random import random
 from socket import (
     create_connection,
@@ -39,9 +45,16 @@ from socket import (
     SO_REUSEADDR,
     SO_SNDBUF,
 )
-from struct import calcsize, pack, unpack
+from struct import (
+    calcsize,
+    pack,
+    unpack,
+)
 from time import sleep
-from typing import Optional
+from typing import (
+    Any,
+    Optional,
+)
 
 from colorama import Fore
 
@@ -61,7 +74,9 @@ _COLORS = cycle([
     Fore.LIGHTRED_EX,
     Fore.LIGHTGREEN_EX,
     Fore.LIGHTBLUE_EX,
+    Fore.LIGHTYELLOW_EX,
     Fore.LIGHTMAGENTA_EX,
+    Fore.LIGHTCYAN_EX,
 ])
 
 
@@ -92,7 +107,7 @@ class TCPSocket:
         payload = bytes(msg, _ENCODING)
         return self._send_msg(MessageType.TEXT, payload)
 
-    def send_json_msg(self, msg: dict[str, any]) -> int:
+    def send_json_msg(self, msg: dict[str, Any]) -> int:
         payload = bytes(dumps(msg), _ENCODING)
         return self._send_msg(MessageType.JSON, payload)
 
@@ -108,7 +123,7 @@ class TCPSocket:
         payload = self._socket.recv(length)
         return payload.decode(_ENCODING)
 
-    def recv_json_msg(self) -> dict[str, any]:
+    def recv_json_msg(self) -> dict[str, Any]:
         length, msg_type = self._recv_header()
         if msg_type != MessageType.JSON:
             raise ValueError(f"Unexpected message type: {msg_type}.")
@@ -135,7 +150,7 @@ class UDPSocket:
         payload = bytes(dumps(msg), _ENCODING)
         self._send_msg(dst, MessageType.TEXT, payload)
 
-    def send_json_msg(self, dst: Endpoint, msg: dict[str, any]) -> None:
+    def send_json_msg(self, dst: Endpoint, msg: dict[str, Any]) -> None:
         payload = bytes(dumps(msg), _ENCODING)
         self._send_msg(dst, MessageType.JSON, payload)
 
@@ -157,7 +172,7 @@ class UDPSocket:
             payload.decode(_ENCODING)
         )
 
-    def recv_json_msg(self) -> tuple[Endpoint, dict[str, any]]:
+    def recv_json_msg(self) -> tuple[Endpoint, dict[str, Any]]:
         datagram, (address, port) = self._socket.recvfrom(self._msg_size)
         msg_length, msg_type = unpack(_HEADER_FORMAT, datagram[0:_HEADER_SIZE])
         if msg_type != MessageType.JSON:
@@ -172,8 +187,8 @@ class UDPSocket:
         self._socket.close()
 
 
-def open_tcp_listener(address: str, port: int) -> socket:
-    return create_server((address, port), family=AF_INET)
+def open_tcp_listener(address: str, port: int, reuse_port: bool = False) -> socket:
+    return create_server((address, port), family=AF_INET, reuse_port=reuse_port)
 
 
 def open_tcp_connection(address: str, port: int, timeout_sec: int) -> TCPSocket:
@@ -209,7 +224,7 @@ def open_multicast_subscriber(address: str, port: int, msg_size: int = 4096) -> 
     return UDPSocket(subscriber, msg_size)
 
 
-def random_sleep(min_sec: int, max_sec:int) -> float:
+def random_sleep(min_sec: int, max_sec:int) -> None:
     duration_sec = min_sec + random() * (max_sec - min_sec)
     sleep(duration_sec)
 
