@@ -49,6 +49,8 @@ def create_cmd_line_args_parser() -> ArgumentParser:
 def parse_cmd_line_args() -> Namespace:
     parser = create_cmd_line_args_parser()
     params = parser.parse_args()
+    if not (1024 <= params.port <= 65535):
+        parser.error("Port must be between 1024 and 65535.")
     return params
 
 
