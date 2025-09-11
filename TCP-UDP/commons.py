@@ -33,6 +33,7 @@ from socket import (
     create_server,
     inet_aton,
     socket,
+    timeout,
     AF_INET,
     INADDR_ANY,
     IPPROTO_IP,
@@ -140,6 +141,33 @@ class TCPSocket:
         self._socket.close()
 
 
+@dataclass(frozen=True)
+class RemoteAddress:
+    host: str
+    port: int
+
+
+class TCPListener:
+
+    def __init__(self, socket: socket) -> None:
+        self._socket = socket
+        
+    def accept(self) -> tuple[TCPSocket, RemoteAddress]:
+        self._socket.settimeout(1)
+        while True:
+            try:
+                connection, (remote_address, remote_port) = self._socket.accept()
+                return (
+                    TCPSocket(connection),
+                    RemoteAddress(host=remote_address, port=remote_port),
+                )
+            except timeout:
+                ...
+
+    def close(self) -> None:
+        self._socket.close()
+
+
 class UDPSocket:
 
     def __init__(self, socket: socket, msg_size: int) -> None:
@@ -187,8 +215,9 @@ class UDPSocket:
         self._socket.close()
 
 
-def open_tcp_listener(address: str, port: int, reuse_port: bool = False) -> socket:
-    return create_server((address, port), family=AF_INET, reuse_port=reuse_port)
+def open_tcp_listener(address: str, port: int, reuse_port: bool = False) -> TCPListener:
+    socket = create_server((address, port), family=AF_INET, reuse_port=reuse_port)
+    return TCPListener(socket)
 
 
 def open_tcp_connection(address: str, port: int, timeout_sec: int) -> TCPSocket:

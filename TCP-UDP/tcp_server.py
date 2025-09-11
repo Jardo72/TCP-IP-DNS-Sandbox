@@ -103,9 +103,9 @@ def main() -> None:
     try:
         listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port, cmd_line_args.reuse_port)
         while True:
-            connection, (remote_address, remote_port) = listener.accept()
-            print(f"Client connection accepted from ({remote_address}:{remote_port})...")
-            client_thread = ClientThread(TCPSocket(connection))
+            connection, remote_address = listener.accept()
+            print(f"Client connection accepted from ({remote_address.host}:{remote_address.port})...")
+            client_thread = ClientThread(connection)
             client_thread.start()
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
