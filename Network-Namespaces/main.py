@@ -17,9 +17,25 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    Namespace,
+    RawTextHelpFormatter,
+)
+from dataclasses import dataclass
+from typing import Tuple
 
-from pyroute2 import IPRoute
+# TODO:
+# from pyroute2 import (
+#     IPRoute,
+#     netns,
+# )
+
+
+@dataclass(frozen=True)
+class Configuration:
+    bridge: str
+    namespaces: Tuple[str, ...]
 
 
 def epilog() -> str:
@@ -29,10 +45,21 @@ def epilog() -> str:
 
 def create_cmd_line_agrs_parser() -> ArgumentParser:
     parser = ArgumentParser(
-        description="",
+        description="Network Namespaces Demo",
         formatter_class=RawTextHelpFormatter,
         epilog=epilog()
     )
+
+    parser.add_argument(
+        "command",
+        choices=["create", "destroy"],
+        help="the IP address the server has to bind to (use 0.0.0.0 to bind to all network interfaces)",
+    )
+    parser.add_argument(
+        "config_file",
+        help="the name of the file with the configuration to applied or destroyed",
+    )
+
     return parser
 
 
@@ -41,8 +68,30 @@ def parse_cmd_line_args() -> Namespace:
     return parser.parse_args()
 
 
+def read_config(filename: str) -> Configuration:
+    with open(filename, "r") as config_file:
+        ...
+    ...
+
+
+def create_config(config: Configuration) -> None:
+    ...
+
+
+def destroy_config(config: Configuration) -> None:
+    ...
+
+
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
+    try:
+        config = read_config(cmd_line_args.config_file)
+        if cmd_line_args.command == "create":
+            create_config(config)
+        else:
+            destroy_config(config)
+    except:
+        ...
 
 
 if __name__ == "__main__":
