@@ -64,6 +64,8 @@ def main() -> None:
         rcv_buf_size = connection.get_rcv_buff_size()
         print(f"Client connection accepted from ({remote_address.host}:{remote_address.port}), input buffer size = {rcv_buf_size} bytes...")
         input("Press enter to start reading the data")
+        rcv_buf_size = connection.get_rcv_buff_size()
+        print(f"Eventually changed input buffer size = {rcv_buf_size} bytes")
         while True:
             connection.recv_json_msg()
     except KeyboardInterrupt:
