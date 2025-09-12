@@ -107,8 +107,12 @@ def create_config(config: Configuration) -> None:
 
 def destroy_config(config: Configuration) -> None:
     with IPRoute() as ip_route:
+        ip_route.link("set", ifname=config.bridge.name, state="down")
+        ip_route.link("delete", ifname=config.bridge.name, kind="bridge")
+        print(f"Bridge {config.bridge.name} deleted...")
         for namespace in config.namespaces:
             netns.remove(namespace.name)
+            print(f"Namespace {namespace.name} removed...")
 
 
 def main() -> None:
