@@ -23,19 +23,34 @@ from argparse import (
     RawTextHelpFormatter,
 )
 from dataclasses import dataclass
-from typing import Tuple
+from traceback import print_exc
+from typing import (
+    Optional,
+    Tuple,
+)
 
-# TODO:
-# from pyroute2 import (
-#     IPRoute,
-#     netns,
-# )
+from pyroute2 import (
+    IPRoute,
+    netns,
+)
+
+
+@dataclass(frozen=True)
+class NetworkNamespace:
+    name: str
+    description: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class NetworkBridge:
+    name: str
+    description: Optional[str] = None
 
 
 @dataclass(frozen=True)
 class Configuration:
-    bridge: str
-    namespaces: Tuple[str, ...]
+    bridge: NetworkBridge
+    namespaces: Tuple[NetworkNamespace, ...]
 
 
 def epilog() -> str:
@@ -69,17 +84,31 @@ def parse_cmd_line_args() -> Namespace:
 
 
 def read_config(filename: str) -> Configuration:
-    with open(filename, "r") as config_file:
-        ...
-    ...
+    # with open(filename, "r") as config_file:
+    #     ...
+    return Configuration(
+        bridge=NetworkBridge(name="BRIDGE-01"),
+        namespaces=(
+            NetworkNamespace(name="NS-01"),
+            NetworkNamespace(name="NS-02"),
+        ),
+    )
 
 
 def create_config(config: Configuration) -> None:
-    ...
+    with IPRoute() as ip_route:
+        for namespace in config.namespaces:
+            netns.create(namespace.name)
+            print(f"Namespace {namespace.name} created...")
+        ip_route.link("add", ifname=config.bridge.name, kind="bridge")
+        ip_route.link("set", ifname=config.bridge.name, state="up")
+        print(f"Bridge {config.bridge.name} created and up...")
 
 
 def destroy_config(config: Configuration) -> None:
-    ...
+    with IPRoute() as ip_route:
+        for namespace in config.namespaces:
+            netns.remove(namespace.name)
 
 
 def main() -> None:
@@ -91,7 +120,7 @@ def main() -> None:
         else:
             destroy_config(config)
     except:
-        ...
+        print_exc()
 
 
 if __name__ == "__main__":
