@@ -105,6 +105,7 @@ def main() -> None:
     colorama_init()
     cmd_line_args = parse_cmd_line_args()
     print(f"TCP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
+    print(f"Reuse address = {cmd_line_args.reuse_address}, reuse port = {cmd_line_args.reuse_port}")
     listener = None
 
     try:

@@ -225,7 +225,8 @@ def _is_reuse_port_supported() -> bool:
 
 def open_tcp_listener(address: str, port: int, reuse_address: bool = False, reuse_port: bool = False) -> TCPListener:
     server_socket = socket(AF_INET, SOCK_STREAM)
-    server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1 if reuse_address else 0)
+    if reuse_address:
+        server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1 if reuse_address else 0)
     if _is_reuse_port_supported() and reuse_port:
         from socket import SO_REUSEPORT
         server_socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1 if reuse_port else 0)
