@@ -27,10 +27,10 @@ from json import (
     dumps,
     loads,
 )
+from platform import system
 from random import random
 from socket import (
     create_connection,
-    create_server,
     inet_aton,
     socket,
     timeout,
@@ -41,6 +41,7 @@ from socket import (
     IP_ADD_MEMBERSHIP,
     IP_MULTICAST_TTL,
     SOCK_DGRAM,
+    SOCK_STREAM,
     SOL_SOCKET,
     SO_RCVBUF,
     SO_REUSEADDR,
@@ -215,9 +216,22 @@ class UDPSocket:
         self._socket.close()
 
 
-def open_tcp_listener(address: str, port: int, reuse_port: bool = False) -> TCPListener:
-    socket = create_server((address, port), family=AF_INET, reuse_port=reuse_port)
-    return TCPListener(socket)
+def _is_reuse_port_supported() -> bool:
+    import socket
+    if system() == "Windows":
+        return False
+    return hasattr(socket, "SO_REUSEPORT")
+
+
+def open_tcp_listener(address: str, port: int, reuse_address: bool = False, reuse_port: bool = False) -> TCPListener:
+    server_socket = socket(AF_INET, SOCK_STREAM)
+    server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1 if reuse_address else 0)
+    if _is_reuse_port_supported() and reuse_port:
+        from socket import SO_REUSEPORT
+        server_socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1 if reuse_port else 0)
+    server_socket.bind((address, port))
+    server_socket.listen(5)
+    return TCPListener(server_socket)
 
 
 def open_tcp_connection(address: str, port: int, timeout_sec: int) -> TCPSocket:

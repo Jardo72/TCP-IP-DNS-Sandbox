@@ -76,7 +76,14 @@ def create_cmd_line_args_parser() -> ArgumentParser:
         type=int
     )
     parser.add_argument(
-        "-r", "--reuse-port",
+        "-a", "--reuse-address",
+        dest="reuse_address",
+        default=False,
+        action="store_true",
+        help="if specified, the SO_REUSEADDRESS socket option will be set on the server socket"
+    )
+    parser.add_argument(
+        "-p", "--reuse-port",
         dest="reuse_port",
         default=False,
         action="store_true",
@@ -101,7 +108,12 @@ def main() -> None:
     listener = None
 
     try:
-        listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port, cmd_line_args.reuse_port)
+        listener = open_tcp_listener(
+            cmd_line_args.address,
+            cmd_line_args.port,
+            cmd_line_args.reuse_address,
+            cmd_line_args.reuse_port
+        )
         while True:
             connection, remote_address = listener.accept()
             print(f"Client connection accepted from ({remote_address.host}:{remote_address.port})...")
