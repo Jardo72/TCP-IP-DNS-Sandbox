@@ -165,6 +165,17 @@ class TCPListener:
             except timeout:
                 ...
 
+    def get_reuse_address(self) -> bool:
+        reuse_address = self._socket.getsockopt(SOL_SOCKET, SO_REUSEADDR)
+        return bool(reuse_address)
+
+    def get_reuse_port(self) -> bool:
+        if not is_reuse_port_supported():
+            return False
+        from socket import SO_REUSEPORT
+        reuse_port = self._socket.getsockopt(SOL_SOCKET, SO_REUSEPORT)
+        return bool(reuse_port)
+
     def close(self) -> None:
         self._socket.close()
 

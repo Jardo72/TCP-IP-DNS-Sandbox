@@ -117,6 +117,9 @@ def main() -> None:
             reuse_address=cmd_line_args.reuse_address,
             reuse_port=cmd_line_args.reuse_port,
         )
+        print(f"TCP server is listening on {cmd_line_args.address}:{cmd_line_args.port}...")
+        print(f"SO_REUSEADDR = {listener.get_reuse_address()}, SO_REUSEPORT = {listener.get_reuse_port()}")
+        print("Press Ctrl+C to terminate the server.")
         while True:
             connection, remote_address = listener.accept()
             print(f"Client connection accepted from ({remote_address.host}:{remote_address.port})...")
