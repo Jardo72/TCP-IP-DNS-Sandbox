@@ -59,7 +59,12 @@ def main() -> None:
     print(f"TCP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
     listener = None
     try:
-        listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port)
+        listener = open_tcp_listener(
+            address=cmd_line_args.address,
+            port=cmd_line_args.port,
+            reuse_address=True,
+            reuse_port=False,
+        )
         connection, remote_address = listener.accept()
         rcv_buf_size = connection.get_rcv_buff_size()
         print(f"Client connection accepted from ({remote_address.host}:{remote_address.port}), input buffer size = {rcv_buf_size} bytes...")

@@ -216,10 +216,10 @@ class UDPSocket:
         self._socket.close()
 
 
-def _is_reuse_port_supported() -> bool:
-    import socket
+def is_reuse_port_supported() -> bool:
     if system() == "Windows":
         return False
+    import socket
     return hasattr(socket, "SO_REUSEPORT")
 
 
@@ -227,7 +227,7 @@ def open_tcp_listener(address: str, port: int, reuse_address: bool = False, reus
     server_socket = socket(AF_INET, SOCK_STREAM)
     if reuse_address:
         server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1 if reuse_address else 0)
-    if _is_reuse_port_supported() and reuse_port:
+    if reuse_port and is_reuse_port_supported():
         from socket import SO_REUSEPORT
         server_socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1 if reuse_port else 0)
     server_socket.bind((address, port))
