@@ -24,6 +24,7 @@ from argparse import (
 )
 from itertools import count
 from os import getpid
+from platform import system
 from threading import (
     Thread,
     current_thread,
@@ -107,7 +108,7 @@ def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     print(f"TCP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
     print(f"Reuse address = {cmd_line_args.reuse_address}, reuse port = {cmd_line_args.reuse_port}")
-    print(f"SO_REUSEPORT supported = {is_reuse_port_supported()}")
+    print(f"OS = {system()}, SO_REUSEPORT supported = {is_reuse_port_supported()}")
     listener = None
 
     try:
