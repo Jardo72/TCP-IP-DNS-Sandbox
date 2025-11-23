@@ -27,10 +27,10 @@ from json import (
     dumps,
     loads,
 )
+from platform import system
 from random import random
 from socket import (
     create_connection,
-    create_server,
     inet_aton,
     socket,
     timeout,
@@ -41,6 +41,7 @@ from socket import (
     IP_ADD_MEMBERSHIP,
     IP_MULTICAST_TTL,
     SOCK_DGRAM,
+    SOCK_STREAM,
     SOL_SOCKET,
     SO_RCVBUF,
     SO_REUSEADDR,
@@ -164,6 +165,17 @@ class TCPListener:
             except timeout:
                 ...
 
+    def get_reuse_address(self) -> bool:
+        reuse_address = self._socket.getsockopt(SOL_SOCKET, SO_REUSEADDR)
+        return bool(reuse_address)
+
+    def get_reuse_port(self) -> bool:
+        if not is_reuse_port_supported():
+            return False
+        from socket import SO_REUSEPORT
+        reuse_port = self._socket.getsockopt(SOL_SOCKET, SO_REUSEPORT)
+        return bool(reuse_port)
+
     def close(self) -> None:
         self._socket.close()
 
@@ -215,9 +227,23 @@ class UDPSocket:
         self._socket.close()
 
 
-def open_tcp_listener(address: str, port: int, reuse_port: bool = False) -> TCPListener:
-    socket = create_server((address, port), family=AF_INET, reuse_port=reuse_port)
-    return TCPListener(socket)
+def is_reuse_port_supported() -> bool:
+    if system() == "Windows":
+        return False
+    import socket
+    return hasattr(socket, "SO_REUSEPORT")
+
+
+def open_tcp_listener(address: str, port: int, reuse_address: bool = False, reuse_port: bool = False) -> TCPListener:
+    server_socket = socket(AF_INET, SOCK_STREAM)
+    if reuse_address:
+        server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1 if reuse_address else 0)
+    if reuse_port and is_reuse_port_supported():
+        from socket import SO_REUSEPORT
+        server_socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1 if reuse_port else 0)
+    server_socket.bind((address, port))
+    server_socket.listen(5)
+    return TCPListener(server_socket)
 
 
 def open_tcp_connection(address: str, port: int, timeout_sec: int) -> TCPSocket:

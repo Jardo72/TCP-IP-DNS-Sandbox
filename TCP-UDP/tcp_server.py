@@ -24,6 +24,7 @@ from argparse import (
 )
 from itertools import count
 from os import getpid
+from platform import system
 from threading import (
     Thread,
     current_thread,
@@ -34,6 +35,7 @@ from colorama import Style
 
 from commons import (
     TCPSocket,
+    is_reuse_port_supported,
     open_tcp_listener,
     next_color,
 )
@@ -76,11 +78,18 @@ def create_cmd_line_args_parser() -> ArgumentParser:
         type=int
     )
     parser.add_argument(
-        "-r", "--reuse-port",
+        "-a", "--reuse-address",
+        dest="reuse_address",
+        default=False,
+        action="store_true",
+        help="if specified, the SO_REUSEADDRESS socket option will be set on the server socket (by default, it is not set)"
+    )
+    parser.add_argument(
+        "-p", "--reuse-port",
         dest="reuse_port",
         default=False,
         action="store_true",
-        help="if specified, the SO_REUSEPORT socket option will be set on the server socket"
+        help="if specified, the SO_REUSEPORT socket option will be set on the server socket (by default, it is not set)"
     )
 
     return parser
@@ -98,10 +107,20 @@ def main() -> None:
     colorama_init()
     cmd_line_args = parse_cmd_line_args()
     print(f"TCP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
+    print(f"Reuse address = {cmd_line_args.reuse_address}, reuse port = {cmd_line_args.reuse_port}")
+    print(f"OS = {system()}, SO_REUSEPORT supported = {is_reuse_port_supported()}")
     listener = None
 
     try:
-        listener = open_tcp_listener(cmd_line_args.address, cmd_line_args.port, cmd_line_args.reuse_port)
+        listener = open_tcp_listener(
+            address=cmd_line_args.address,
+            port=cmd_line_args.port,
+            reuse_address=cmd_line_args.reuse_address,
+            reuse_port=cmd_line_args.reuse_port,
+        )
+        print(f"TCP server is listening on {cmd_line_args.address}:{cmd_line_args.port}...")
+        print(f"SO_REUSEADDR = {listener.get_reuse_address()}, SO_REUSEPORT = {listener.get_reuse_port()}")
+        print("Press Ctrl+C to terminate the server.")
         while True:
             connection, remote_address = listener.accept()
             print(f"Client connection accepted from ({remote_address.host}:{remote_address.port})...")
