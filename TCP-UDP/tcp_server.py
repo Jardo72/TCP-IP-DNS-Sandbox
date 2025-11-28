@@ -82,7 +82,7 @@ def create_cmd_line_args_parser() -> ArgumentParser:
         dest="reuse_address",
         default=False,
         action="store_true",
-        help="if specified, the SO_REUSEADDRESS socket option will be set on the server socket (by default, it is not set)"
+        help="if specified, the SO_REUSEADDR socket option will be set on the server socket (by default, it is not set)"
     )
     parser.add_argument(
         "-p", "--reuse-port",
