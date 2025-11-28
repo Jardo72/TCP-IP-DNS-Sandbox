@@ -1,5 +1,7 @@
 # AWS Infrastructure
 
+## Introduction
+
 Terraform configuration allowing to provision AWS infrastructure that can be used to run the [TCP/IP demo applications](../TCP-UDP). The overall setup is depicted by the following diagram:
 ![application-diagram](./diagram.png)
 
@@ -10,3 +12,24 @@ The VPC is associated with a Route 53 private hosted zone. The Terraform configu
 Network troubleshooting tools like netstat and tcpdump are installed on all EC2 instances. In addition, all EC2 instances have access to the S3 bucket. Therefore, network captures created with tcpdump can be uploaded to the S3 bucket, so you can download the capture files to your localhost and analyze them with Wireshark.
 
 The EC2 instances are also configured in a way the AWS Systems Manager Session Manager can be used to connect to the EC2 instances. In other words, you can open a terminal window in the AWS Management Console, and you do not have to deal with SSH keys.
+
+## How Create/Destroy the Infrastructure
+
+In order to create the AWS infrastructure, you will need Terraform. You can download and install it from [Install Terraform web site](https://developer.hashicorp.com/terraform/install). When it is installed, you will have setup AWS credentials. Create an AWS access key for user that has sufficient permissions to create the infrastructure. In the terminal window where you want to run Terraform, set/export the following environment variables:
+
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+
+After setting the credentials, you are ready to create the infrastructure with the following commands:
+
+```sh
+terraform init
+terraform plan
+terraform apply -auto-approve
+```
+
+When you are ready with the experiments, you want to shutdown the infrastrutcure so that it does not incurr any unnecessary costs. You can do it with the following command:
+
+```sh
+terraform destroy -auto-approve
+```
