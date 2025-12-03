@@ -118,18 +118,22 @@ class TCPSocket:
         self._socket.sendall(header + payload)
         return len(header) + len(payload)
 
-    def recv_text_msg(self) -> Optional[str]:
+    def recv_text_msg(self, timeout_sec: Optional[float] = None) -> Optional[str]:
+        self._socket.settimeout(timeout_sec)
         length, msg_type = self._recv_header()
         if msg_type != MessageType.TEXT:
             raise ValueError(f"Unexpected message type: {msg_type}.")
         payload = self._socket.recv(length)
+        self._socket.settimeout(None)
         return payload.decode(_ENCODING)
 
-    def recv_json_msg(self) -> dict[str, Any]:
+    def recv_json_msg(self, timeout_sec: Optional[float] = None) -> dict[str, Any]:
+        self._socket.settimeout(timeout_sec)
         length, msg_type = self._recv_header()
         if msg_type != MessageType.JSON:
             raise ValueError(f"Unexpected message type: {msg_type}.")
         payload = self._socket.recv(length)
+        self._socket.settimeout(None)
         return loads(payload.decode(_ENCODING))
 
     def _recv_header(self) -> tuple[int, int]:
@@ -246,7 +250,7 @@ def open_tcp_listener(address: str, port: int, reuse_address: bool = False, reus
     return TCPListener(server_socket)
 
 
-def open_tcp_connection(address: str, port: int, timeout_sec: int) -> TCPSocket:
+def open_tcp_connection(address: str, port: int, timeout_sec: Optional[float] = None) -> TCPSocket:
     connection = create_connection((address, port), timeout=timeout_sec)
     return TCPSocket(connection)
 
