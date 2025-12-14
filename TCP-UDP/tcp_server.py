@@ -25,10 +25,12 @@ from argparse import (
 from itertools import count
 from os import getpid
 from platform import system
+from time import sleep
 from threading import (
     Thread,
     current_thread,
 )
+from typing import Optional
 
 from colorama import init as colorama_init
 from colorama import Style
@@ -45,15 +47,18 @@ class ClientThread(Thread):
 
     seq = count(1)
 
-    def __init__(self, socket: TCPSocket) -> None:
+    def __init__(self, socket: TCPSocket, response_delay_sec: Optional[float] = None) -> None:
         super().__init__(name=f"Worker-{next(self.seq)}", daemon=True)
-        self._socket = socket
+        self._response_delay_sec = response_delay_sec
         self._color = next_color()
+        self._socket = socket
 
     def run(self) -> None:
         try:
             while True:
                 input_msg = self._socket.recv_text_msg()
+                if self._response_delay_sec:
+                    sleep(self._response_delay_sec)
                 output_msg = f"Response to message: {input_msg}"
                 self._socket.send_text_msg(output_msg)
                 print(f"{self._color}{current_thread().name}: {output_msg}{Style.RESET_ALL}")
@@ -91,6 +96,12 @@ def create_cmd_line_args_parser() -> ArgumentParser:
         action="store_true",
         help="if specified, the SO_REUSEPORT socket option will be set on the server socket (by default, it is not set)"
     )
+    parser.add_argument(
+        "-d", "--response-delay-sec",
+        dest="response_delay_sec",
+        help="optional response delay in seconds (default = no delay)",
+        type=float,
+    )
 
     return parser
 
@@ -109,6 +120,10 @@ def main() -> None:
     print(f"TCP server (PID = {getpid()}) going to bind to {cmd_line_args.address}:{cmd_line_args.port}")
     print(f"Reuse address = {cmd_line_args.reuse_address}, reuse port = {cmd_line_args.reuse_port}")
     print(f"OS = {system()}, SO_REUSEPORT supported = {is_reuse_port_supported()}")
+    if cmd_line_args.response_delay_sec:
+        print(f"Response delay = {cmd_line_args.response_delay_sec} sec")
+    else:
+        print("No response delay configured")
     listener = None
 
     try:
@@ -124,7 +139,7 @@ def main() -> None:
         while True:
             connection, remote_address = listener.accept()
             print(f"Client connection accepted from ({remote_address.host}:{remote_address.port})...")
-            client_thread = ClientThread(connection)
+            client_thread = ClientThread(connection, cmd_line_args.response_delay_sec)
             client_thread.start()
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")

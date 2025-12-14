@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+from contextlib import suppress
 from dataclasses import dataclass
 from enum import (
     IntEnum,
@@ -105,32 +106,48 @@ class TCPSocket:
     def get_rcv_buff_size(self) -> int:
         return self._socket.getsockopt(SOL_SOCKET, SO_RCVBUF)
 
-    def send_text_msg(self, msg: str) -> int:
+    def send_text_msg(self, msg: str, timeout_sec: Optional[float] = None) -> int:
         payload = bytes(msg, _ENCODING)
-        return self._send_msg(MessageType.TEXT, payload)
+        return self._send_msg(MessageType.TEXT, payload, timeout_sec)
 
-    def send_json_msg(self, msg: dict[str, Any]) -> int:
+    def send_json_msg(self, msg: dict[str, Any], timeout_sec: Optional[float] = None) -> int:
         payload = bytes(dumps(msg), _ENCODING)
-        return self._send_msg(MessageType.JSON, payload)
+        return self._send_msg(MessageType.JSON, payload, timeout_sec)
 
-    def _send_msg(self, msg_type: MessageType, payload: bytes) -> int:
-        header = pack(_HEADER_FORMAT, len(payload), msg_type)
-        self._socket.sendall(header + payload)
-        return len(header) + len(payload)
+    def _clear_timeout(self) -> None:
+        with suppress(Exception):
+            self._socket.settimeout(None)
 
-    def recv_text_msg(self) -> Optional[str]:
-        length, msg_type = self._recv_header()
-        if msg_type != MessageType.TEXT:
-            raise ValueError(f"Unexpected message type: {msg_type}.")
-        payload = self._socket.recv(length)
-        return payload.decode(_ENCODING)
+    def _send_msg(self, msg_type: MessageType, payload: bytes, timeout_sec: Optional[float] = None) -> int:
+        try:
+            header = pack(_HEADER_FORMAT, len(payload), msg_type)
+            self._socket.settimeout(timeout_sec)
+            self._socket.sendall(header + payload)
+            return len(header) + len(payload)
+        finally:
+            self._clear_timeout()
 
-    def recv_json_msg(self) -> dict[str, Any]:
-        length, msg_type = self._recv_header()
-        if msg_type != MessageType.JSON:
-            raise ValueError(f"Unexpected message type: {msg_type}.")
-        payload = self._socket.recv(length)
-        return loads(payload.decode(_ENCODING))
+    def recv_text_msg(self, timeout_sec: Optional[float] = None) -> Optional[str]:
+        try:
+            length, msg_type = self._recv_header()
+            if msg_type != MessageType.TEXT:
+                raise ValueError(f"Unexpected message type: {msg_type}.")
+            self._socket.settimeout(timeout_sec)
+            payload = self._socket.recv(length)
+            return payload.decode(_ENCODING)
+        finally:
+            self._clear_timeout()
+
+    def recv_json_msg(self, timeout_sec: Optional[float] = None) -> dict[str, Any]:
+        try:
+            length, msg_type = self._recv_header()
+            if msg_type != MessageType.JSON:
+                raise ValueError(f"Unexpected message type: {msg_type}.")
+            self._socket.settimeout(timeout_sec)
+            payload = self._socket.recv(length)
+            return loads(payload.decode(_ENCODING))
+        finally:
+            self._clear_timeout()
 
     def _recv_header(self) -> tuple[int, int]:
         header_as_bytes = self._socket.recv(_HEADER_SIZE)
@@ -246,7 +263,7 @@ def open_tcp_listener(address: str, port: int, reuse_address: bool = False, reus
     return TCPListener(server_socket)
 
 
-def open_tcp_connection(address: str, port: int, timeout_sec: int) -> TCPSocket:
+def open_tcp_connection(address: str, port: int, timeout_sec: Optional[float] = None) -> TCPSocket:
     connection = create_connection((address, port), timeout=timeout_sec)
     return TCPSocket(connection)
 
