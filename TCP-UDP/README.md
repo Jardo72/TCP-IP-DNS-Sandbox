@@ -5,7 +5,7 @@ This directory contains a set of applications serving as demonstration of TCP an
 
 ![PDU Structure](./pdu.png)
 
-3rd party dependencies which must be installed are listed in the [reuirements.txt](./requirements.txt) file. All applications are self-documented concerning the command line arguments. In other words, if you start any of the applications with the `-h` or `--help` switch, you will get instructions how to start the application.
+3rd party dependencies which must be installed are listed in the [reuirements.txt](./requirements.txt) file. All **applications are self-documented concerning the command line arguments**. In other words, if you start any of the applications with the `-h` or `--help` switch, you will get instructions how to start the application.
 
 
 ## TCP Unicast Communication
@@ -13,6 +13,14 @@ Demonstration of TCP communication.
 Applications:
 * [tcp_server.py](./tcp_server.py) is a multi-threaded TCP server which opens a TCP socket in listening mode and accepts incoming connections. For each connection, a new worker thread is started (thread-per-connection model). The worker reads text messages from its TCP connection and sends answers to those messages. The server must be started before any client will try to connect to it.
 * [tcp_client.py](./tcp_client.py) is a TCP client which establishes a TCP connection to the given IP address and TCP port. In addition, it repeatedly sends text messages to the TCP connections, and it reads answers to those messages.
+
+The server application uses colors to distinguish messages from different clients. When starting the client application, you can specify the name of the client. The name is included in the messages sent to the server. If you start two or more simultaneous clients, each with a different name, the names are visible in the server’s output. The colors and the client names make it easy to distinguish which client is communicating at any given moment (see the screenshots below).
+
+![tcp-server-colors](./tcp-server-colors.png)
+
+![tcp-client-name](./tcp-client-alice.png)
+
+![tcp-client-name](./tcp-client-bob.png)
 
 
 ## TCP Window Size Zero Indication Demo
