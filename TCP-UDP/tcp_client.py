@@ -45,7 +45,7 @@ def create_cmd_line_args_parser() -> ArgumentParser:
     )
 
     parser.add_argument(
-        "-t", "--connect_timeout_sec",
+        "-t", "--connect-timeout-sec",
         dest="connect_timeout_sec",
         default=10,
         help="optional connect timeout in seconds (default = 10 sec)",
