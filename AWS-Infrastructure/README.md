@@ -36,7 +36,7 @@ If a different domain name is required, it can be configured by modifying the ap
 
 During instance initialization, additional software packages are automatically installed. This ensures that common network troubleshooting tools are available on all EC2 instances, including `netstat`, `nc` and `tcpdump`.
 
-All EC2 instances also have access to the designated S3 bucket. Network capture files created with `tcpdump` can be uploaded to this bucket, allowing you to download them to your local machine and analyze them using tools such as Wireshark.
+All EC2 instances also have access to the designated S3 bucket. Network capture files created with `tcpdump` can be uploaded to this bucket using AWS CLI, namely the `aws s3 cp` command. After the upload, they can be downloaded to your local machine either via the AWS Management Console, or via the AWS CLI. Subsequently, they can be analyzed using tools such as Wireshark.
 
 Finally, the EC2 instances are configured to support AWS Systems Manager Session Manager. This allows you to open a terminal session directly from the AWS Management Console without managing SSH keys or opening SSH access to the instances.
 
