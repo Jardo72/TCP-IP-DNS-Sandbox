@@ -23,9 +23,9 @@ The **EC2 instances labeled as clients** are intended to run client-side applica
 
 The security groups attached to the EC2 instances are configured according to these intended roles. Network traffic is permitted only when instances operate in their designated server or client roles. If you change these roles (for example, by running server applications on a client instance or vice versa), network traffic may be blocked by the security groups.
 
-By default, the Terraform configuration assumes that the demo applications use TCP port 1234 and UDP port 1234. These ports are explicitly allowed by the security groups. If you want to use different ports, you must update the corresponding values in the [terraform.tfvars](./terraform.tfvars) file before deploying the infrastructure (look at the [variables.tf](./variables.tf) file to see which variables can be used to customize the configuration). In addition to TCP and UDP traffic, the security groups also allow the ICMP protocol, so tools such as ping work out of the box and can be used for basic connectivity testing.
+By **default**, the Terraform configuration assumes that the demo applications use **TCP port 1234** and **UDP port 1234**. These ports are explicitly allowed by the security groups. If you want to use different ports, you must update the corresponding values in the [terraform.tfvars](./terraform.tfvars) file before deploying the infrastructure (look at the [variables.tf](./variables.tf) file to see which variables can be used to customize the configuration). In addition to TCP and UDP traffic, the security groups also allow the ICMP protocol, so tools such as `ping` work out of the box and can be used for basic connectivity testing.
 
-The VPC is associated with a Route 53 private hosted zone, and Terraform automatically creates DNS records for all EC2 instances. By default, the following DNS names are assigned:
+The VPC is associated with a Route 53 private hosted zone, and Terraform automatically creates DNS records for all EC2 instances. By default, the following **DNS names** are assigned:
 
 - server.tcp-ip-sandbox.jch
 - client-1.tcp-ip-sandbox.jch
