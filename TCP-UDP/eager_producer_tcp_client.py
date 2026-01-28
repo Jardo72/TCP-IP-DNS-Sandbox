@@ -25,6 +25,10 @@ from argparse import (
 from os import getpid
 from random import randint
 from uuid import uuid4
+from typing import (
+    Any,
+    Dict,
+)
 
 from commons import (
     open_tcp_connection,
@@ -53,9 +57,16 @@ def create_cmd_line_args_parser() -> ArgumentParser:
         type=int
     )
     parser.add_argument(
+        "-w", "--write-timeout-sec",
+        dest="write_timeout_sec",
+        default=10,
+        help="optional write timeout in seconds (default = 10 sec)",
+        type=float,
+    )
+    parser.add_argument(
         "-c", "--msg-count",
         dest="msg_count",
-        default=10,
+        default=50,
         help="optional number of messages to be sent (default = 10)",
         type=int
     )
@@ -75,7 +86,7 @@ def parse_cmd_line_args() -> Namespace:
     return params
 
 
-def generate_random_msg(client_name: str, seq_no: int) -> dict[str, any]:
+def generate_random_msg(client_name: str, seq_no: int) -> Dict[str, Any]:
     number_count = randint(2000, 4000)
     uuid_count = randint(2000, 4000)
     return {
@@ -90,6 +101,12 @@ def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     client_name = cmd_line_args.client_name or str(uuid4())
     print(f"TCP client (PID = {getpid()}) going to connect to {cmd_line_args.address}:{cmd_line_args.port}")
+    print(f"Message count = {cmd_line_args.msg_count}")
+    print(f"Connect timeout = {cmd_line_args.connect_timeout_sec} sec")
+    if cmd_line_args.write_timeout_sec:
+        print(f"Write timeout = {cmd_line_args.write_timeout_sec} sec")
+    else:
+        print("No write timeout configured")
     socket = None
     try:
         socket = open_tcp_connection(cmd_line_args.address, cmd_line_args.port, cmd_line_args.connect_timeout_sec)
@@ -98,7 +115,7 @@ def main() -> None:
         cumulative_byte_count = 0
         for i in range(1, cmd_line_args.msg_count + 1):
             msg = generate_random_msg(client_name, i)
-            msg_length = socket.send_json_msg(msg)
+            msg_length = socket.send_json_msg(msg, timeout_sec=cmd_line_args.write_timeout_sec)
             cumulative_byte_count += msg_length
             print(f"Message with sequence number = {i} ({msg_length} bytes, totally {cumulative_byte_count} bytes) sent to server...")
             random_sleep(min_sec=2, max_sec=5)
