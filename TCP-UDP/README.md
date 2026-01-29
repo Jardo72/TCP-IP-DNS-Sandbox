@@ -26,7 +26,7 @@ The server application uses colors to distinguish messages from different client
 ## TCP Window Size Zero Indication Demo
 Demonstration of TCP communication with window size zero indication.  
 Applications:
-* [hesitant_consumer_tcp_server.py](./hesitant_consumer_tcp_server.py) is a simple TCP server that accepts single incoming TCP connection. However, it does not read any data/messages from the TCP connection, so can be used to demonstrate the window size zero indication. The server must be started before any client will try to connect to it.
+* [hesitant_consumer_tcp_server.py](./hesitant_consumer_tcp_server.py) is a simple TCP server that accepts single incoming TCP connection. It does not read any data/messages from the TCP connection unless explitictly ordered to do so, so it can be used to demonstrate the window size zero indication. The server must be started before any client will try to connect to it. After accepting the first incoming connection, it will not accept any further connections. In other words, you need to restart the server if you want to test several scenarios.
 * [eager_producer_tcp_client.py](./eager_producer_tcp_client.py) is a simple TCP client that establishes a TCP connection to the given IP address and TCP port, and it periodically sends some random data over the TCP connection.
 
 

@@ -56,6 +56,7 @@ from struct import (
 from time import sleep
 from typing import (
     Any,
+    Dict,
     Optional,
 )
 
@@ -110,7 +111,7 @@ class TCPSocket:
         payload = bytes(msg, _ENCODING)
         return self._send_msg(MessageType.TEXT, payload, timeout_sec)
 
-    def send_json_msg(self, msg: dict[str, Any], timeout_sec: Optional[float] = None) -> int:
+    def send_json_msg(self, msg: Dict[str, Any], timeout_sec: Optional[float] = None) -> int:
         payload = bytes(dumps(msg), _ENCODING)
         return self._send_msg(MessageType.JSON, payload, timeout_sec)
 
@@ -124,28 +125,34 @@ class TCPSocket:
             self._socket.settimeout(timeout_sec)
             self._socket.sendall(header + payload)
             return len(header) + len(payload)
+        except TimeoutError as e:
+            raise TimeoutError(f"Timeout ({timeout_sec} sec) expired when attempting to write data to the socket.") from e
         finally:
             self._clear_timeout()
 
     def recv_text_msg(self, timeout_sec: Optional[float] = None) -> Optional[str]:
         try:
+            self._socket.settimeout(timeout_sec)
             length, msg_type = self._recv_header()
             if msg_type != MessageType.TEXT:
                 raise ValueError(f"Unexpected message type: {msg_type}.")
-            self._socket.settimeout(timeout_sec)
             payload = self._socket.recv(length)
             return payload.decode(_ENCODING)
+        except TimeoutError as e:
+            raise TimeoutError(f"Timeout ({timeout_sec} sec) expired when attempting to read data from the socket.") from e
         finally:
             self._clear_timeout()
 
-    def recv_json_msg(self, timeout_sec: Optional[float] = None) -> dict[str, Any]:
+    def recv_json_msg(self, timeout_sec: Optional[float] = None) -> Dict[str, Any]:
         try:
+            self._socket.settimeout(timeout_sec)
             length, msg_type = self._recv_header()
             if msg_type != MessageType.JSON:
                 raise ValueError(f"Unexpected message type: {msg_type}.")
-            self._socket.settimeout(timeout_sec)
             payload = self._socket.recv(length)
             return loads(payload.decode(_ENCODING))
+        except TimeoutError as e:
+            raise TimeoutError(f"Timeout ({timeout_sec} sec) expired when attempting to read data from the socket.") from e
         finally:
             self._clear_timeout()
 
@@ -207,7 +214,7 @@ class UDPSocket:
         payload = bytes(dumps(msg), _ENCODING)
         self._send_msg(dst, MessageType.TEXT, payload)
 
-    def send_json_msg(self, dst: Endpoint, msg: dict[str, Any]) -> None:
+    def send_json_msg(self, dst: Endpoint, msg: Dict[str, Any]) -> None:
         payload = bytes(dumps(msg), _ENCODING)
         self._send_msg(dst, MessageType.JSON, payload)
 
@@ -229,7 +236,7 @@ class UDPSocket:
             payload.decode(_ENCODING)
         )
 
-    def recv_json_msg(self) -> tuple[Endpoint, dict[str, Any]]:
+    def recv_json_msg(self) -> tuple[Endpoint, Dict[str, Any]]:
         datagram, (address, port) = self._socket.recvfrom(self._msg_size)
         msg_length, msg_type = unpack(_HEADER_FORMAT, datagram[0:_HEADER_SIZE])
         if msg_type != MessageType.JSON:

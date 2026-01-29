@@ -58,6 +58,7 @@ class ClientThread(Thread):
             while True:
                 input_msg = self._socket.recv_text_msg()
                 if self._response_delay_sec:
+                    print(f"{self._color}{current_thread().name}: Message from client received, going to sleep for {self._response_delay_sec} sec{Style.RESET_ALL}")
                     sleep(self._response_delay_sec)
                 output_msg = f"Response to message: {input_msg}"
                 self._socket.send_text_msg(output_msg)

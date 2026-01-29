@@ -87,8 +87,8 @@ def parse_cmd_line_args() -> Namespace:
 
 
 def generate_random_msg(client_name: str, seq_no: int) -> Dict[str, Any]:
-    number_count = randint(1000, 2000)
-    uuid_count = randint(1000, 2000)
+    number_count = randint(400, 800)
+    uuid_count = randint(400, 800)
     return {
         "client_name": client_name,
         "sequence_number": seq_no,
