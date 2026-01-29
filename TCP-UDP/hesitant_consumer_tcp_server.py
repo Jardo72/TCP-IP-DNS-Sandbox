@@ -70,7 +70,8 @@ def main() -> None:
         print(f"Client connection accepted from ({remote_address.host}:{remote_address.port}), input buffer size = {rcv_buf_size} bytes...")
         input("Press enter to start reading the data")
         while True:
-            connection.recv_json_msg()
+            json_msg = connection.recv_json_msg()
+            print(f"Message with sequence number {json_msg['sequence_number']} received...")
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
     except Exception as e:
