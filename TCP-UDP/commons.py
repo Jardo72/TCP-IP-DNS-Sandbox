@@ -132,10 +132,10 @@ class TCPSocket:
 
     def recv_text_msg(self, timeout_sec: Optional[float] = None) -> Optional[str]:
         try:
+            self._socket.settimeout(timeout_sec)
             length, msg_type = self._recv_header()
             if msg_type != MessageType.TEXT:
                 raise ValueError(f"Unexpected message type: {msg_type}.")
-            self._socket.settimeout(timeout_sec)
             payload = self._socket.recv(length)
             return payload.decode(_ENCODING)
         except TimeoutError as e:
@@ -145,10 +145,10 @@ class TCPSocket:
 
     def recv_json_msg(self, timeout_sec: Optional[float] = None) -> Dict[str, Any]:
         try:
+            self._socket.settimeout(timeout_sec)
             length, msg_type = self._recv_header()
             if msg_type != MessageType.JSON:
                 raise ValueError(f"Unexpected message type: {msg_type}.")
-            self._socket.settimeout(timeout_sec)
             payload = self._socket.recv(length)
             return loads(payload.decode(_ENCODING))
         except TimeoutError as e:
