@@ -125,6 +125,8 @@ class TCPSocket:
             self._socket.settimeout(timeout_sec)
             self._socket.sendall(header + payload)
             return len(header) + len(payload)
+        except TimeoutError as e:
+            raise TimeoutError(f"Timeout ({timeout_sec} sec) expired when attempting to write data to the socket.") from e
         finally:
             self._clear_timeout()
 
@@ -136,6 +138,8 @@ class TCPSocket:
             self._socket.settimeout(timeout_sec)
             payload = self._socket.recv(length)
             return payload.decode(_ENCODING)
+        except TimeoutError as e:
+            raise TimeoutError(f"Timeout ({timeout_sec} sec) expired when attempting to read data from the socket.") from e
         finally:
             self._clear_timeout()
 
@@ -147,6 +151,8 @@ class TCPSocket:
             self._socket.settimeout(timeout_sec)
             payload = self._socket.recv(length)
             return loads(payload.decode(_ENCODING))
+        except TimeoutError as e:
+            raise TimeoutError(f"Timeout ({timeout_sec} sec) expired when attempting to read data from the socket.") from e
         finally:
             self._clear_timeout()
 
