@@ -24,6 +24,7 @@ from argparse import (
 )
 from os import getpid
 from random import randint
+from socket import timeout
 from uuid import uuid4
 from typing import (
     Any,
@@ -121,7 +122,7 @@ def main() -> None:
             random_sleep(min_sec=2, max_sec=5)
     except KeyboardInterrupt:
         print("Keyboard interrupt - exit")
-    except (TimeoutError, ConnectionRefusedError, ConnectionResetError) as e:
+    except (timeout, TimeoutError, ConnectionRefusedError, ConnectionResetError) as e:
         print(f"{type(e).__name__}: {str(e)}")
     except Exception as e:
         print(f"Exception caught: {str(e)}")
