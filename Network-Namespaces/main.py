@@ -1,5 +1,5 @@
 #
-# Copyright 2024 Jaroslav Chmurny
+# Copyright 2026 Jaroslav Chmurny
 #
 # This file is part of TCP/IP & DNS Sandbox.
 #
@@ -55,6 +55,17 @@ class Configuration:
 
 def epilog() -> str:
     return """
+Demo application to create and destroy network namespaces and a bridge connecting them
+according to the specified configuration.
+
+Example configuration file (YAML format):
+
+bridge: NRIDGE-01
+namespaces:
+    - name: NS-01
+      description: First network namespace
+    - name: NS-02
+      description: Second network namespace
 """
 
 
@@ -68,7 +79,7 @@ def create_cmd_line_agrs_parser() -> ArgumentParser:
     parser.add_argument(
         "command",
         choices=["create", "destroy"],
-        help="the IP address the server has to bind to (use 0.0.0.0 to bind to all network interfaces)",
+        help="the action to be performed (create or destroy)",
     )
     parser.add_argument(
         "config_file",
@@ -84,6 +95,10 @@ def parse_cmd_line_args() -> Namespace:
 
 
 def read_config(filename: str) -> Configuration:
+    print(f"Going to read configuration from file {filename}")
+    # TODO:
+    # - implement reading configuration from YAML file
+    # - use marshmallow for validation and parsing
     # with open(filename, "r") as config_file:
     #     ...
     return Configuration(
