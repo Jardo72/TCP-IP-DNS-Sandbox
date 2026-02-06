@@ -78,8 +78,8 @@ def create_cmd_line_agrs_parser() -> ArgumentParser:
 
     parser.add_argument(
         "command",
-        choices=["create", "destroy"],
-        help="the action to be performed (create or destroy)",
+        choices=["apply", "destroy"],
+        help="the action to be performed (apply or destroy)",
     )
     parser.add_argument(
         "config_file",
@@ -110,14 +110,38 @@ def read_config(filename: str) -> Configuration:
     )
 
 
-def create_config(config: Configuration) -> None:
+def create_namespace(ip_route: IPRoute, bridge_name: str, namespace: NetworkNamespace) -> None:
+    # create network namespace
+    netns.create(namespace.name)
+    print(f"Namespace {namespace.name} created...")
+    
+    # create veth pair: root-veth <-> ns-veth
+    root_veth = f"{namespace.name}-root-veth"
+    ns_veth = f"{namespace.name}-ns-veth"
+    ip_route.link("add", ifname=root_veth, kind="veth", peer=ns_veth)
+    print(f"Veth pair created: {root_veth} <-> {ns_veth}")
+    
+    # move namespace veth to the namespace
+    ns_veth_idx = ip_route.link_lookup(ifname=ns_veth)[0]
+    ip_route.link("set", index=ns_veth_idx, net_ns_fd=namespace.name)
+    print(f"Veth {ns_veth} moved to namespace {namespace.name}")
+    
+    # attach the root veth to bridge and bring it up
+    root_veth_idx = ip_route.link_lookup(ifname=root_veth)[0]
+    ip_route.link("set", index=root_veth_idx, master=ip_route.link_lookup(ifname=bridge_name)[0])
+    ip_route.link("set", index=root_veth_idx, state="up")
+    print(f"Veth {root_veth} attached to bridge {bridge_name} and brought up")
+
+
+def apply_config(config: Configuration) -> None:
     with IPRoute() as ip_route:
-        for namespace in config.namespaces:
-            netns.create(namespace.name)
-            print(f"Namespace {namespace.name} created...")
+        # create bridge first
         ip_route.link("add", ifname=config.bridge.name, kind="bridge")
         ip_route.link("set", ifname=config.bridge.name, state="up")
         print(f"Bridge {config.bridge.name} created and up...")
+        
+        for namespace in config.namespaces:
+            create_namespace(ip_route, config.bridge.name, namespace)
 
 
 def destroy_config(config: Configuration) -> None:
@@ -135,7 +159,7 @@ def main() -> None:
     try:
         config = read_config(cmd_line_args.config_file)
         if cmd_line_args.command == "create":
-            create_config(config)
+            apply_config(config)
         else:
             destroy_config(config)
     except:
