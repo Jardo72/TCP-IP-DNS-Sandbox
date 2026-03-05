@@ -25,13 +25,14 @@ from argparse import (
 from dataclasses import dataclass
 from traceback import print_exc
 from typing import (
+    List,
     Optional,
-    Tuple,
 )
 
-
+from marshmallow_dataclass import class_schema
 from pyroute2 import (
     IPRoute,
+    NetNS,
     netns,
 )
 from yaml import safe_load
@@ -53,7 +54,7 @@ class NetworkBridge:
 @dataclass(frozen=True)
 class Configuration:
     bridge: NetworkBridge
-    namespaces: Tuple[NetworkNamespace, ...]
+    namespaces: List[NetworkNamespace]
 
 
 def epilog() -> str:
@@ -63,13 +64,14 @@ according to the specified configuration.
 
 Example configuration file (YAML format):
 
-bridge: BRIDGE-01
+bridge:
+    name: BRIDGE-01
 namespaces:
     - name: NS-01
       ip_address: 10.0.0.1/24
       description: First network namespace
     - name: NS-02
-      ip_address: 10.0.0.1/24
+      ip_address: 10.0.0.2/24
       description: Second network namespace
 """
 
@@ -101,54 +103,61 @@ def parse_cmd_line_args() -> Namespace:
 
 def read_config(filename: str) -> Configuration:
     print(f"Going to read configuration from file {filename}")
-    return Configuration(
-        bridge=NetworkBridge(name="BRIDGE-01"),
-        namespaces=(
-            NetworkNamespace(
-                name="NS-01",
-                ip_address="10.0.0.1/24",
-            ),
-            NetworkNamespace(
-                name="NS-02",
-                ip_address="10.0.0.2/24",
-            ),
-        ),
-    )
-    # TODO:
-    # - implement reading configuration from YAML file
-    # - use marshmallow for validation and parsing
     with open(filename, 'r') as config_file:
         data = safe_load(config_file)
+    schema = class_schema(Configuration)()
+    return schema.load(data)
+
+
+def configure_namespace_veth(namespace: NetworkNamespace) -> None:
+    ns_veth = f"{namespace.name}-ns-veth"
+    ip_addr, prefix_len = namespace.ip_address.split('/')
+    with NetNS(namespace.name) as ns:
+        # bring up loopback
+        lo_idx = ns.link_lookup(ifname="lo")[0]
+        ns.link("set", index=lo_idx, state="up")
+        print(f"Loopback brought up in namespace {namespace.name}")
+
+        # assign IP and bring up the veth inside the namespace
+        ns_veth_idx = ns.link_lookup(ifname=ns_veth)[0]
+        ns.addr("add", index=ns_veth_idx, address=ip_addr, prefixlen=int(prefix_len))
+        ns.link("set", index=ns_veth_idx, state="up")
+        print(f"Interface {ns_veth} configured with {namespace.ip_address} and brought up")
 
 
 def create_namespace(ip_route: IPRoute, bridge_name: str, namespace: NetworkNamespace) -> None:
     # create network namespace
     netns.create(namespace.name)
     print(f"Namespace {namespace.name} created...")
-    
+
     # create veth pair: root-veth <-> ns-veth
     root_veth = f"{namespace.name}-root-veth"
     ns_veth = f"{namespace.name}-ns-veth"
     ip_route.link("add", ifname=root_veth, kind="veth", peer=ns_veth)
     print(f"Veth pair created: {root_veth} <-> {ns_veth}")
-    
+
     # move namespace veth to the namespace
     ns_veth_idx = ip_route.link_lookup(ifname=ns_veth)[0]
     ip_route.link("set", index=ns_veth_idx, net_ns_fd=namespace.name)
     print(f"Veth {ns_veth} moved to namespace {namespace.name}")
-    
+
     # attach the root veth to bridge and bring it up
+    bridge_idx = ip_route.link_lookup(ifname=bridge_name)[0]
     root_veth_idx = ip_route.link_lookup(ifname=root_veth)[0]
-    ip_route.link("set", index=root_veth_idx, master=ip_route.link_lookup(ifname=bridge_name)[0])
+    ip_route.link("set", index=root_veth_idx, master=bridge_idx)
     ip_route.link("set", index=root_veth_idx, state="up")
     print(f"Veth {root_veth} attached to bridge {bridge_name} and brought up")
+
+    # configure IP and bring up the veth inside the namespace
+    configure_namespace_veth(namespace)
 
 
 def apply_config(config: Configuration) -> None:
     with IPRoute() as ip_route:
         # create bridge first
         ip_route.link("add", ifname=config.bridge.name, kind="bridge")
-        ip_route.link("set", ifname=config.bridge.name, state="up")
+        bridge_idx = ip_route.link_lookup(ifname=config.bridge.name)[0]
+        ip_route.link("set", index=bridge_idx, state="up")
         print(f"Bridge {config.bridge.name} created and up...")
         
         for namespace in config.namespaces:
@@ -157,19 +166,23 @@ def apply_config(config: Configuration) -> None:
 
 def destroy_config(config: Configuration) -> None:
     with IPRoute() as ip_route:
-        ip_route.link("set", ifname=config.bridge.name, state="down")
-        ip_route.link("delete", ifname=config.bridge.name, kind="bridge")
-        print(f"Bridge {config.bridge.name} deleted...")
+        # remove namespaces first — deleting ns-veth also auto-deletes its root-veth peer
         for namespace in config.namespaces:
             netns.remove(namespace.name)
             print(f"Namespace {namespace.name} removed...")
+
+        # then delete the bridge
+        bridge_idx = ip_route.link_lookup(ifname=config.bridge.name)[0]
+        ip_route.link("set", index=bridge_idx, state="down")
+        ip_route.link("delete", index=bridge_idx)
+        print(f"Bridge {config.bridge.name} deleted...")
 
 
 def main() -> None:
     cmd_line_args = parse_cmd_line_args()
     try:
         config = read_config(cmd_line_args.config_file)
-        if cmd_line_args.command == "create":
+        if cmd_line_args.command == "apply":
             apply_config(config)
         else:
             destroy_config(config)
