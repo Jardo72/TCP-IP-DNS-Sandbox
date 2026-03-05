@@ -29,15 +29,18 @@ from typing import (
     Tuple,
 )
 
+
 from pyroute2 import (
     IPRoute,
     netns,
 )
+from yaml import safe_load
 
 
 @dataclass(frozen=True)
 class NetworkNamespace:
     name: str
+    ip_address: str
     description: Optional[str] = None
 
 
@@ -60,11 +63,13 @@ according to the specified configuration.
 
 Example configuration file (YAML format):
 
-bridge: NRIDGE-01
+bridge: BRIDGE-01
 namespaces:
     - name: NS-01
+      ip_address: 10.0.0.1/24
       description: First network namespace
     - name: NS-02
+      ip_address: 10.0.0.1/24
       description: Second network namespace
 """
 
@@ -96,18 +101,24 @@ def parse_cmd_line_args() -> Namespace:
 
 def read_config(filename: str) -> Configuration:
     print(f"Going to read configuration from file {filename}")
-    # TODO:
-    # - implement reading configuration from YAML file
-    # - use marshmallow for validation and parsing
-    # with open(filename, "r") as config_file:
-    #     ...
     return Configuration(
         bridge=NetworkBridge(name="BRIDGE-01"),
         namespaces=(
-            NetworkNamespace(name="NS-01"),
-            NetworkNamespace(name="NS-02"),
+            NetworkNamespace(
+                name="NS-01",
+                ip_address="10.0.0.1/24",
+            ),
+            NetworkNamespace(
+                name="NS-02",
+                ip_address="10.0.0.2/24",
+            ),
         ),
     )
+    # TODO:
+    # - implement reading configuration from YAML file
+    # - use marshmallow for validation and parsing
+    with open(filename, 'r') as config_file:
+        data = safe_load(config_file)
 
 
 def create_namespace(ip_route: IPRoute, bridge_name: str, namespace: NetworkNamespace) -> None:
